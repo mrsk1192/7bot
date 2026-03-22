@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xml>
+  <Name value="mnetSevenDaysBridge" />
+  <DisplayName value="mnet Seven Days Bridge" />
+  <Description value="Phase 2 localhost-only bridge for 7 Days to Die client-side automation experiments." />
+  <Author value="OpenAI Codex" />
+  <Version value="0.2.0.0" />
+  <Website value="" />
+  <SkipWithAntiCheat value="true" />
+</xml>
