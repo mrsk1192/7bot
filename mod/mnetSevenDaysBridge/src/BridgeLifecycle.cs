@@ -6,12 +6,13 @@ namespace mnetSevenDaysBridge
 {
     public sealed class BridgeLifecycle : IDisposable
     {
-        public const string BridgeVersion = "0.3.0.0";
+        public const string BridgeVersion = "0.5.0.0";
 
         private readonly string modRootPath;
         private readonly BridgeConfig config;
         private readonly BridgeLogger logger;
         private readonly CommandQueue commandQueue;
+        private readonly ObservationCommandQueue observationCommandQueue;
         private readonly InputStateMachine inputStateMachine;
         private readonly InternalInputBackend internalInputBackend;
         private readonly OSInputBackend osInputBackend;
@@ -19,8 +20,12 @@ namespace mnetSevenDaysBridge
         private readonly DeathRespawnStateTracker deathRespawnStateTracker;
         private readonly RespawnController respawnController;
         private readonly InputAdapter inputAdapter;
+        private readonly ObservationService observationService;
         private readonly GameStateCollector collector;
+        private readonly ObservationAdapter observationAdapter;
+        private readonly StartupAutomationController startupAutomationController;
         private readonly HttpCommandReceiver receiver;
+        private WebSocketPushServer webSocketServer;
         private GameObject runtimeObject;
         private BridgeRuntimeBehaviour runtimeBehaviour;
         private bool disposed;
@@ -36,6 +41,7 @@ namespace mnetSevenDaysBridge
             config = BridgeConfig.Load(modRootPath);
             logger = new BridgeLogger(this.modRootPath, config.MaxLogLinesInMemory);
             commandQueue = new CommandQueue(config);
+            observationCommandQueue = new ObservationCommandQueue();
             inputStateMachine = new InputStateMachine();
             internalInputBackend = new InternalInputBackend(logger);
             osInputBackend = new OSInputBackend(logger, config);
@@ -51,12 +57,21 @@ namespace mnetSevenDaysBridge
                 osInputBackend,
                 inputBackendRouter,
                 respawnController);
+            observationService = new ObservationService(logger);
             collector = new GameStateCollector(
                 logger,
                 () => inputAdapter.GetInputState(),
                 () => inputAdapter.GetUiState(),
                 () => inputAdapter.IsBackendAvailable(),
-                () => inputAdapter.GetDeathRespawnState());
+                () => inputAdapter.GetDeathRespawnState(),
+                observationService);
+            observationAdapter = new ObservationAdapter(
+                logger,
+                collector,
+                observationService,
+                observationCommandQueue,
+                () => webSocketServer);
+            startupAutomationController = new StartupAutomationController(logger, config);
             receiver = new HttpCommandReceiver(
                 config,
                 logger,
@@ -64,7 +79,9 @@ namespace mnetSevenDaysBridge
                 collector,
                 CreateVersionInfo(),
                 inputAdapter,
-                commandQueue);
+                commandQueue,
+                observationService,
+                observationCommandQueue);
         }
 
 
@@ -81,10 +98,12 @@ namespace mnetSevenDaysBridge
             logger.Info(
                 $"RateLimit={config.MaxCommandsPerSecond}/s QueueLimit={config.MaxCommandQueueLength} DefaultLookStep={config.DefaultLookStep}");
             logger.Info($"OS input backend enabled={config.EnableOsInputBackend} bring_to_front={config.BringGameWindowToFrontForOsInput}");
-            logger.Info("Phase 3 policy: death/respawn state is tracked explicitly, death clears held input, and respawn resets the input state machine.");
-            BridgeHarmonyPatcher.Apply(logger, internalInputBackend, respawnController);
+            logger.Info($"Startup automation enabled={config.AutoQuickContinueOnStartup} world={config.AutoQuickContinueGameWorld} save={config.AutoQuickContinueGameName}");
+            logger.Info("Phase 4 policy: observation APIs are served from main-thread execution with explicit look-target, interaction, nearby resource, interactable, entity, biome, and terrain summaries.");
+            BridgeHarmonyPatcher.Apply(logger, internalInputBackend, respawnController, startupAutomationController, config);
             EnsureRuntimeBehaviour();
             receiver.Start();
+            webSocketServer?.Start();
             logger.Info($"Startup completed. Log file: {logger.LogFilePath}");
         }
 
@@ -97,6 +116,7 @@ namespace mnetSevenDaysBridge
 
             disposed = true;
             receiver.Dispose();
+            webSocketServer?.Dispose();
             try
             {
                 inputAdapter.ForceNeutralState();
@@ -141,7 +161,7 @@ namespace mnetSevenDaysBridge
             runtimeObject = new GameObject("mnetSevenDaysBridgeRuntime");
             UnityEngine.Object.DontDestroyOnLoad(runtimeObject);
             runtimeBehaviour = runtimeObject.AddComponent<BridgeRuntimeBehaviour>();
-            runtimeBehaviour.Initialize(inputAdapter, logger);
+            runtimeBehaviour.Initialize(inputAdapter, observationAdapter, startupAutomationController, logger);
         }
     }
 }

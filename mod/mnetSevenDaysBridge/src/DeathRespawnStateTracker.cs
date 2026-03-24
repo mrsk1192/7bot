@@ -9,6 +9,7 @@ namespace mnetSevenDaysBridge
         private DeathRespawnStateSnapshot snapshot = DeathRespawnStateSnapshot.CreateDefault();
         private DateTime? justRespawnedUntilUtc;
         private SpawnMethod? lastRequestedSpawnMethod;
+        private bool isFirstRefresh = true;
 
         public DeathRespawnStateTracker(BridgeLogger logger)
         {
@@ -31,7 +32,8 @@ namespace mnetSevenDaysBridge
                 var isDead = player != null
                     ? player.IsDead()
                     : (uiState.DeathScreenOpen || uiState.RespawnScreenOpen);
-                var died = !previous.IsDead && isDead;
+                var died = !isFirstRefresh && !previous.IsDead && isDead;
+                if (isFirstRefresh) isFirstRefresh = false;
                 var respawned = previous.IsDead && !isDead && alive.GetValueOrDefault(false);
 
                 if (died)
@@ -68,7 +70,17 @@ namespace mnetSevenDaysBridge
                     : uiState.NearestSpawnOptionSummary;
                 snapshot.JustRespawned = justRespawnedUntilUtc.HasValue && nowUtc <= justRespawnedUntilUtc.Value;
 
-                if (!snapshot.IsDead && !snapshot.RespawnScreenOpen)
+                if (snapshot.Alive == true && !snapshot.IsDead)
+                {
+                    snapshot.DeathScreenVisible = false;
+                    snapshot.DeathScreenOpen = false;
+                    snapshot.RespawnScreenOpen = false;
+                    snapshot.RespawnConfirmationOpen = false;
+                    snapshot.RespawnAvailable = false;
+                    snapshot.RespawnCooldownSeconds = null;
+                    snapshot.RespawnInProgress = false;
+                }
+                else if (!snapshot.IsDead && !snapshot.RespawnScreenOpen)
                 {
                     snapshot.RespawnInProgress = false;
                 }
@@ -132,6 +144,36 @@ namespace mnetSevenDaysBridge
             lock (syncRoot)
             {
                 snapshot.RespawnInProgress = false;
+            }
+        }
+
+        public float? ComputeFallbackCooldown(EntityPlayerLocal player)
+        {
+            if (player == null)
+            {
+                return null;
+            }
+
+            var waitSeconds = player.GetTimeStayAfterDeath();
+            if (waitSeconds <= 0)
+            {
+                return 0f;
+            }
+
+            lock (syncRoot)
+            {
+                if (string.IsNullOrWhiteSpace(snapshot.LastDeathTime)
+                    || !DateTime.TryParse(
+                        snapshot.LastDeathTime,
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        System.Globalization.DateTimeStyles.RoundtripKind,
+                        out var deathUtc))
+                {
+                    return 0f;
+                }
+
+                var elapsed = (float)Math.Max(0d, (DateTime.UtcNow - deathUtc).TotalSeconds);
+                return Math.Max(0f, waitSeconds - elapsed);
             }
         }
 

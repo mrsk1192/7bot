@@ -41,9 +41,9 @@ def main() -> int:
 
     if ping.get("message") != "pong":
         raise SystemExit("ping failed: expected pong")
-    if version.bridge_version != "0.3.0.0":
+    if version.bridge_version != "0.5.0.0":
         raise SystemExit(f"unexpected bridge version: {version.bridge_version}")
-    if capabilities.phase != "phase3":
+    if capabilities.phase != "phase4":
         raise SystemExit(f"unexpected capabilities phase: {capabilities.phase}")
     if position.available and state.player and state.player.position is None:
         raise SystemExit("state.position should be populated when position endpoint reports available")

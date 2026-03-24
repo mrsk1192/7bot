@@ -29,6 +29,12 @@ namespace mnetSevenDaysBridge
 
         public bool BringGameWindowToFrontForOsInput { get; set; } = true;
 
+        public bool AutoQuickContinueOnStartup { get; set; } = true;
+
+        public string AutoQuickContinueGameWorld { get; set; } = "Pregen08k01";
+
+        public string AutoQuickContinueGameName { get; set; } = "VanillaDiagClientOnly";
+
         public string BaseUrl
         {
             get { return $"http://{Host}:{Port}/"; }
@@ -76,7 +82,16 @@ namespace mnetSevenDaysBridge
                 MaxCommandQueueLength = config.MaxCommandQueueLength <= 0 ? 256 : config.MaxCommandQueueLength,
                 DefaultLookStep = config.DefaultLookStep <= 0f ? 12f : config.DefaultLookStep,
                 EnableOsInputBackend = config.EnableOsInputBackend,
-                BringGameWindowToFrontForOsInput = config.BringGameWindowToFrontForOsInput
+                BringGameWindowToFrontForOsInput = config.BringGameWindowToFrontForOsInput,
+                AutoQuickContinueOnStartup = config.AutoQuickContinueOnStartup,
+                AutoQuickContinueGameWorld = string.IsNullOrWhiteSpace(config.AutoQuickContinueGameWorld)
+                    ? "Pregen08k01"
+                    : config.AutoQuickContinueGameWorld,
+                AutoQuickContinueGameName = string.IsNullOrWhiteSpace(config.AutoQuickContinueGameName)
+                    ? "VanillaDiagClientOnly"
+                    : config.AutoQuickContinueGameName,
+                WebSocketPort = config.WebSocketPort <= 0 ? 18772 : config.WebSocketPort,
+                EnableWebSocketPush = config.EnableWebSocketPush
             };
         }
 
@@ -105,6 +120,16 @@ namespace mnetSevenDaysBridge
             public bool EnableOsInputBackend { get; set; } = true;
 
             public bool BringGameWindowToFrontForOsInput { get; set; } = true;
+
+            public bool AutoQuickContinueOnStartup { get; set; } = true;
+
+            public string AutoQuickContinueGameWorld { get; set; } = "Pregen08k01";
+
+            public string AutoQuickContinueGameName { get; set; } = "VanillaDiagClientOnly";
+
+            public int WebSocketPort { get; set; } = 18772;
+
+            public bool EnableWebSocketPush { get; set; } = true;
 
             public static BridgeConfigDto FromDictionary(System.Collections.Generic.Dictionary<string, object> values)
             {
@@ -168,6 +193,34 @@ namespace mnetSevenDaysBridge
                     && bringGameWindowToFrontForOsInput != null)
                 {
                     dto.BringGameWindowToFrontForOsInput = Convert.ToBoolean(bringGameWindowToFrontForOsInput);
+                }
+
+                if (TryGet(values, "auto_quick_continue_on_startup", out var autoQuickContinueOnStartup)
+                    && autoQuickContinueOnStartup != null)
+                {
+                    dto.AutoQuickContinueOnStartup = Convert.ToBoolean(autoQuickContinueOnStartup);
+                }
+
+                if (TryGet(values, "auto_quick_continue_game_world", out var autoQuickContinueGameWorld)
+                    && autoQuickContinueGameWorld != null)
+                {
+                    dto.AutoQuickContinueGameWorld = autoQuickContinueGameWorld.ToString();
+                }
+
+                if (TryGet(values, "auto_quick_continue_game_name", out var autoQuickContinueGameName)
+                    && autoQuickContinueGameName != null)
+                {
+                    dto.AutoQuickContinueGameName = autoQuickContinueGameName.ToString();
+                }
+
+                if (TryGet(values, "websocket_port", out var websocketPort) && websocketPort != null)
+                {
+                    dto.WebSocketPort = Convert.ToInt32(websocketPort);
+                }
+
+                if (TryGet(values, "enable_websocket_push", out var enableWebSocketPush) && enableWebSocketPush != null)
+                {
+                    dto.EnableWebSocketPush = Convert.ToBoolean(enableWebSocketPush);
                 }
 
                 return dto;

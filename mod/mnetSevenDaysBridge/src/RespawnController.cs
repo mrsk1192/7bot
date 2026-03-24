@@ -59,8 +59,9 @@ namespace mnetSevenDaysBridge
             {
                 controller.RefreshButtons();
             }
-            catch
+            catch (Exception ex)
             {
+                logger.Warn("RefreshButtons on spawn-selection open failed (non-fatal): " + ex.Message);
             }
 
             if (pending == null)
@@ -191,46 +192,12 @@ namespace mnetSevenDaysBridge
 
         private void DumpXUiToLogger(XUi xui)
         {
-            var sb = new System.Text.StringBuilder();
-            sb.AppendLine("=== XUi Tree Dump ===");
-            var windowGroups = ReadMember(xui, "WindowGroups") as IEnumerable;
-            if (windowGroups == null) { sb.AppendLine("WindowGroups is null!"); }
-            else
-            {
-                foreach (var windowGroup in windowGroups)
-                {
-                    string id = ReadMember(windowGroup, "ID") as string ?? "unknown_id";
-                    bool isShowing = TryReadBool(windowGroup, "isShowing") ?? false;
-                    var controller = ReadMember(windowGroup, "Controller") as XUiController;
-                    string ctlName = controller != null ? controller.GetType().Name : "null";
-                    sb.AppendLine($"Group: {id} (isShowing={isShowing}) -> [Controller: {ctlName}]");
-                    if (isShowing && controller != null)
-                    {
-                        DumpChildren(controller, sb, "  ");
-                    }
-                }
-            }
-            logger.Info(sb.ToString());
+            ReflectionUtils.DumpXUiToLogger(xui, logger);
         }
 
-        private void DumpChildren(XUiController parent, System.Text.StringBuilder sb, string indent)
+        private static void DumpChildren(XUiController parent, System.Text.StringBuilder sb, string indent)
         {
-            IEnumerable children = null;
-            foreach (var name in new[] { "Children", "childControllers", "m_ChildControllers", "children" })
-            {
-                children = ReadMember(parent, name) as IEnumerable;
-                if (children != null) break;
-            }
-            if (children == null) return;
-
-            foreach (var childObj in children)
-            {
-                var child = childObj as XUiController;
-                if (child == null) continue;
-                string id = ReadMember(child.ViewComponent, "ID") as string ?? "unknown_view_id";
-                sb.AppendLine($"{indent}- Child: {id} [Controller: {child.GetType().Name}]");
-                DumpChildren(child, sb, indent + "  ");
-            }
+            ReflectionUtils.DumpChildren(parent, sb, indent);
         }
 
         public RespawnActionExecutionResult WaitForRespawnComplete(int timeoutMs)
@@ -473,6 +440,7 @@ namespace mnetSevenDaysBridge
                 }
             }
 
+            bool requestSent = false;
             if (gameManager != null)
             {
                 try
@@ -480,17 +448,24 @@ namespace mnetSevenDaysBridge
                     var reqMethod = gameManager.GetType().GetMethod("RequestToSpawnPlayer", BindingFlags.Public | BindingFlags.Instance);
                     if (reqMethod != null)
                     {
-                        var args = new object[reqMethod.GetParameters().Length];
-                        args[0] = player.entityId;
-                        args[1] = spawnMode;
-                        args[2] = spawnPos;
-                        for (int i = 3; i < args.Length; i++)
+                        var parameters = reqMethod.GetParameters();
+                        var args = new object[parameters.Length];
+                        foreach (var p in parameters)
                         {
-                            var pType = reqMethod.GetParameters()[i].ParameterType;
-                            args[i] = pType.IsValueType ? Activator.CreateInstance(pType) : null;
-                            if (reqMethod.GetParameters()[i].Name.Contains("nearEntityId")) args[i] = -1;
+                            if (p.Name == "entityId" || p.Position == 0)
+                                args[p.Position] = player.entityId;
+                            else if (p.Name == "spawnMode" || p.Position == 1)
+                                args[p.Position] = spawnMode;
+                            else if (p.Name.Contains("pos") || p.Position == 2)
+                                args[p.Position] = spawnPos;
+                            else if (p.Name.Contains("nearEntityId"))
+                                args[p.Position] = -1;
+                            else
+                                args[p.Position] = p.ParameterType.IsValueType
+                                    ? Activator.CreateInstance(p.ParameterType) : null;
                         }
                         reqMethod.Invoke(gameManager, args);
+                        requestSent = true;
                     }
                 }
                 catch (Exception ex)
@@ -498,7 +473,12 @@ namespace mnetSevenDaysBridge
                     logger.Error("Failed to invoke RequestToSpawnPlayer via reflection.", ex);
                 }
             }
-            player.Respawn(RespawnType.Died);
+
+            if (!requestSent)
+            {
+                logger.Warn("RequestToSpawnPlayer was not available; falling back to player.Respawn().");
+                player.Respawn(RespawnType.Died);
+            }
 
             tracker.MarkRespawnRequested(method, BuildSpawnSummary(method, player.GetSpawnPoint(), state.BedrollSpawnAvailable, player));
             logger.Info("Respawn command executed through direct GameManager spawn request with method=" + method);
@@ -522,7 +502,7 @@ namespace mnetSevenDaysBridge
             var existing = GetSpawnSelectionController(ui);
             if (existing != null)
             {
-                try { existing.RefreshButtons(); } catch { }
+                try { existing.RefreshButtons(); } catch (Exception ex) { logger.Warn("RefreshButtons on existing controller failed (non-fatal): " + ex.Message); }
                 return existing;
             }
 
@@ -533,7 +513,7 @@ namespace mnetSevenDaysBridge
                 var controller = GetSpawnSelectionController(ui);
                 if (controller != null)
                 {
-                    try { controller.RefreshButtons(); } catch { }
+                    try { controller.RefreshButtons(); } catch (Exception ex) { logger.Warn("RefreshButtons on opened controller failed (non-fatal): " + ex.Message); }
                 }
                 return controller;
             }
@@ -580,6 +560,10 @@ namespace mnetSevenDaysBridge
         private RespawnActionExecutionResult WaitUntil(int timeoutMs, Func<DeathRespawnStateSnapshot, bool> predicate, string successNote, string timeoutMessage)
         {
             var effectiveTimeoutMs = timeoutMs <= 0 ? 15000 : timeoutMs;
+            if (effectiveTimeoutMs > 10000)
+            {
+                logger.Warn($"WaitUntil called with long timeout={effectiveTimeoutMs}ms blocking the HTTP listener thread.");
+            }
             var deadline = DateTime.UtcNow.AddMilliseconds(effectiveTimeoutMs);
             while (DateTime.UtcNow <= deadline)
             {
@@ -703,7 +687,10 @@ namespace mnetSevenDaysBridge
                     }
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                logger.Warn("FindObjectsOfTypeAll fallback scan failed (non-fatal): " + ex.Message);
+            }
 
             return null;
         }
@@ -732,7 +719,7 @@ namespace mnetSevenDaysBridge
             IEnumerable children = null;
             foreach (var name in new[] { "Children", "childControllers", "m_ChildControllers", "children" })
             {
-                children = ReadMember(parent, name) as IEnumerable;
+                children = ReflectionUtils.ReadMember(parent, name) as IEnumerable;
                 if (children != null)
                 {
                     break;
@@ -847,34 +834,6 @@ namespace mnetSevenDaysBridge
             }
         }
 
-        private float? ComputeFallbackCooldown(EntityPlayerLocal player)
-        {
-            if (player == null)
-            {
-                return null;
-            }
-
-            var waitSeconds = player.GetTimeStayAfterDeath();
-            if (waitSeconds <= 0)
-            {
-                return 0f;
-            }
-
-            var snapshot = tracker.GetSnapshot();
-            if (string.IsNullOrWhiteSpace(snapshot.LastDeathTime)
-                || !DateTime.TryParse(
-                    snapshot.LastDeathTime,
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.RoundtripKind,
-                    out var deathUtc))
-            {
-                return 0f;
-            }
-
-            var elapsed = (float)Math.Max(0d, (DateTime.UtcNow - deathUtc).TotalSeconds);
-            return Math.Max(0f, waitSeconds - elapsed);
-        }
-
         private static float? NormalizeCooldown(float? cooldown)
         {
             if (!cooldown.HasValue)
@@ -935,7 +894,7 @@ namespace mnetSevenDaysBridge
                 return null;
             }
 
-            var position = ReadMember(spawnTarget, "position");
+            var position = ReflectionUtils.ReadMember(spawnTarget, "position");
             if (position is UnityEngine.Vector3 vector3)
             {
                 return string.Format(
@@ -949,82 +908,11 @@ namespace mnetSevenDaysBridge
             return spawnTarget.ToString();
         }
 
-        private static object ReadMember(object target, string name)
-        {
-            if (target == null || string.IsNullOrWhiteSpace(name))
-            {
-                return null;
-            }
-
-            var type = target.GetType();
-            var property = type.GetProperty(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (property != null)
-            {
-                return property.GetValue(target, null);
-            }
-
-            var field = type.GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            return field == null ? null : field.GetValue(target);
-        }
-
-        private static float? TryReadFloat(object target, string name)
-        {
-            var raw = ReadMember(target, name);
-            if (raw == null)
-            {
-                return null;
-            }
-
-            if (raw is float single)
-            {
-                return single;
-            }
-
-            if (raw is double @double)
-            {
-                return (float)@double;
-            }
-
-            return float.TryParse(Convert.ToString(raw, CultureInfo.InvariantCulture), NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed)
-                ? parsed
-                : (float?)null;
-        }
-
-        private static bool? TryReadBool(object target, string name)
-        {
-            var raw = ReadMember(target, name);
-            if (raw == null)
-            {
-                return null;
-            }
-
-            if (raw is bool value)
-            {
-                return value;
-            }
-
-            return bool.TryParse(Convert.ToString(raw, CultureInfo.InvariantCulture), out var parsed)
-                ? parsed
-                : (bool?)null;
-        }
-
-        private static TEnum? TryReadEnum<TEnum>(object target, string name) where TEnum : struct
-        {
-            var raw = ReadMember(target, name);
-            if (raw == null)
-            {
-                return null;
-            }
-
-            if (raw is TEnum value)
-            {
-                return value;
-            }
-
-            return Enum.TryParse(Convert.ToString(raw, CultureInfo.InvariantCulture), true, out TEnum parsed)
-                ? parsed
-                : (TEnum?)null;
-        }
+        // Reflection helpers delegated to ReflectionUtils.
+        private static object ReadMember(object target, string name) => ReflectionUtils.ReadMember(target, name);
+        private static float? TryReadFloat(object target, string name) => ReflectionUtils.TryReadFloat(target, name);
+        private static bool? TryReadBool(object target, string name) => ReflectionUtils.TryReadBool(target, name);
+        private static TEnum? TryReadEnum<TEnum>(object target, string name) where TEnum : struct => ReflectionUtils.TryReadEnum<TEnum>(target, name);
 
         private sealed class PendingSpawnInvocation
         {

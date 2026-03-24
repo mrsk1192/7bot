@@ -35,6 +35,454 @@ class RotationState:
 
 
 @dataclass
+class LookTargetObservation:
+    has_target: bool
+    source: str
+    target_kind: str
+    target_name: str
+    target_class: str
+    target_id: Any
+    entity_id: Any
+    block_id: Any
+    distance: float
+    position: Optional[Vector3State]
+    can_interact: bool
+    interaction_prompt_text: str
+    interaction_action_kind: str
+    hostile: bool
+    alive: bool
+    locked: Any
+    powered: Any
+    active: Any
+    line_of_sight_clear: Any
+    is_resource_candidate: bool
+    candidate_category: str
+    candidate_confidence: float
+    likely_resource_type: str
+    durability: Any
+    max_durability: Any
+    note: str
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "LookTargetObservation":
+        payload = payload or {}
+        return cls(
+            has_target=bool(payload.get("HasTarget", False)),
+            source=str(payload.get("Source", "unknown")),
+            target_kind=str(payload.get("TargetKind", "none")),
+            target_name=str(payload.get("TargetName", "Unknown")),
+            target_class=str(payload.get("TargetClass", "Unknown")),
+            target_id=payload.get("TargetId"),
+            entity_id=payload.get("EntityId"),
+            block_id=payload.get("BlockId"),
+            distance=float(payload.get("Distance", 0.0)),
+            position=Vector3State.from_dict(payload.get("Position")),
+            can_interact=bool(payload.get("CanInteract", False)),
+            interaction_prompt_text=str(payload.get("InteractionPromptText", "Unknown")),
+            interaction_action_kind=str(payload.get("InteractionActionKind", "none")),
+            hostile=bool(payload.get("Hostile", False)),
+            alive=bool(payload.get("Alive", False)),
+            locked=payload.get("Locked"),
+            powered=payload.get("Powered"),
+            active=payload.get("Active"),
+            line_of_sight_clear=payload.get("LineOfSightClear"),
+            is_resource_candidate=bool(payload.get("IsResourceCandidate", False)),
+            candidate_category=str(payload.get("CandidateCategory", "unknown")),
+            candidate_confidence=float(payload.get("CandidateConfidence", 0.0)),
+            likely_resource_type=str(payload.get("LikelyResourceType", "unknown")),
+            durability=payload.get("Durability"),
+            max_durability=payload.get("MaxDurability"),
+            note=str(payload.get("Note", "")),
+        )
+
+
+@dataclass
+class InteractionContextObservation:
+    has_focus_target: bool
+    can_interact_now: bool
+    suggested_action_kind: str
+    prompt_text: str
+    target_kind: str
+    target_name: str
+    distance: float
+    source: str
+    requires_precise_alignment: bool
+    recommended_interact_distance_min: Any
+    recommended_interact_distance_max: Any
+    note: str
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "InteractionContextObservation":
+        payload = payload or {}
+        return cls(
+            has_focus_target=bool(payload.get("HasFocusTarget", False)),
+            can_interact_now=bool(payload.get("CanInteractNow", False)),
+            suggested_action_kind=str(payload.get("SuggestedActionKind", "unknown")),
+            prompt_text=str(payload.get("PromptText", "Unknown")),
+            target_kind=str(payload.get("TargetKind", "none")),
+            target_name=str(payload.get("TargetName", "Unknown")),
+            distance=float(payload.get("Distance", 0.0)),
+            source=str(payload.get("Source", "unknown")),
+            requires_precise_alignment=bool(payload.get("RequiresPreciseAlignment", False)),
+            recommended_interact_distance_min=payload.get("RecommendedInteractDistanceMin"),
+            recommended_interact_distance_max=payload.get("RecommendedInteractDistanceMax"),
+            note=str(payload.get("Note", "")),
+        )
+
+
+@dataclass
+class ObservationAvailability:
+    look_target_available: bool
+    interaction_context_available: bool
+    resource_query_available: bool
+    interactable_query_available: bool
+    entity_query_available: bool
+    environment_summary_available: bool
+    biome_info_available: bool
+    terrain_summary_available: bool
+    note: str
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "ObservationAvailability":
+        payload = payload or {}
+        return cls(
+            look_target_available=bool(payload.get("LookTargetAvailable", False)),
+            interaction_context_available=bool(payload.get("InteractionContextAvailable", False)),
+            resource_query_available=bool(payload.get("ResourceQueryAvailable", False)),
+            interactable_query_available=bool(payload.get("InteractableQueryAvailable", False)),
+            entity_query_available=bool(payload.get("EntityQueryAvailable", False)),
+            environment_summary_available=bool(payload.get("EnvironmentSummaryAvailable", False)),
+            biome_info_available=bool(payload.get("BiomeInfoAvailable", False)),
+            terrain_summary_available=bool(payload.get("TerrainSummaryAvailable", False)),
+            note=str(payload.get("Note", "")),
+        )
+
+
+@dataclass
+class ResourceObservation:
+    player_position: Optional[Vector3State]
+    player_rotation: Optional[RotationState]
+    biome: str
+    look_target: LookTargetObservation
+    interaction_context: InteractionContextObservation
+    availability: ObservationAvailability
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "ResourceObservation":
+        payload = payload or {}
+        return cls(
+            player_position=Vector3State.from_dict(payload.get("PlayerPosition")),
+            player_rotation=RotationState.from_dict(payload.get("PlayerRotation")),
+            biome=str(payload.get("Biome", "Unknown")),
+            look_target=LookTargetObservation.from_dict(payload.get("LookTarget")),
+            interaction_context=InteractionContextObservation.from_dict(payload.get("InteractionContext")),
+            availability=ObservationAvailability.from_dict(payload.get("Availability")),
+        )
+
+
+@dataclass
+class ResourceCandidateObservation:
+    name: str
+    block_id: Any
+    position: Optional[Vector3State]
+    distance: float
+    candidate_category: str
+    candidate_confidence: float
+    likely_resource_type: str
+    is_exposed: bool
+    biome: str
+    line_of_sight_clear: Any
+    reachable_hint: Any
+    note: str
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "ResourceCandidateObservation":
+        payload = payload or {}
+        return cls(
+            name=str(payload.get("Name", "Unknown")),
+            block_id=payload.get("BlockId"),
+            position=Vector3State.from_dict(payload.get("Position")),
+            distance=float(payload.get("Distance", 0.0)),
+            candidate_category=str(payload.get("CandidateCategory", "unknown")),
+            candidate_confidence=float(payload.get("CandidateConfidence", 0.0)),
+            likely_resource_type=str(payload.get("LikelyResourceType", "unknown")),
+            is_exposed=bool(payload.get("IsExposed", False)),
+            biome=str(payload.get("Biome", "Unknown")),
+            line_of_sight_clear=payload.get("LineOfSightClear"),
+            reachable_hint=payload.get("ReachableHint"),
+            note=str(payload.get("Note", "")),
+        )
+
+
+@dataclass
+class InteractableObservation:
+    kind: str
+    id: Any
+    name: str
+    position: Optional[Vector3State]
+    distance: float
+    can_interact: bool
+    interaction_prompt_text: str
+    interaction_action_kind: str
+    locked: Any
+    powered: Any
+    active: Any
+    line_of_sight_clear: Any
+    note: str
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "InteractableObservation":
+        payload = payload or {}
+        return cls(
+            kind=str(payload.get("Kind", "unknown")),
+            id=payload.get("Id"),
+            name=str(payload.get("Name", "Unknown")),
+            position=Vector3State.from_dict(payload.get("Position")),
+            distance=float(payload.get("Distance", 0.0)),
+            can_interact=bool(payload.get("CanInteract", False)),
+            interaction_prompt_text=str(payload.get("InteractionPromptText", "Unknown")),
+            interaction_action_kind=str(payload.get("InteractionActionKind", "unknown")),
+            locked=payload.get("Locked"),
+            powered=payload.get("Powered"),
+            active=payload.get("Active"),
+            line_of_sight_clear=payload.get("LineOfSightClear"),
+            note=str(payload.get("Note", "")),
+        )
+
+
+@dataclass
+class EntityObservation:
+    entity_id: Any
+    entity_name: str
+    entity_class: str
+    kind: str
+    position: Optional[Vector3State]
+    distance: float
+    alive: bool
+    hostile: bool
+    can_interact: bool
+    current_targeting_player: Any
+    line_of_sight_clear: Any
+    note: str
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "EntityObservation":
+        payload = payload or {}
+        return cls(
+            entity_id=payload.get("EntityId"),
+            entity_name=str(payload.get("EntityName", "Unknown")),
+            entity_class=str(payload.get("EntityClass", "Unknown")),
+            kind=str(payload.get("Kind", "unknown")),
+            position=Vector3State.from_dict(payload.get("Position")),
+            distance=float(payload.get("Distance", 0.0)),
+            alive=bool(payload.get("Alive", False)),
+            hostile=bool(payload.get("Hostile", False)),
+            can_interact=bool(payload.get("CanInteract", False)),
+            current_targeting_player=payload.get("CurrentTargetingPlayer"),
+            line_of_sight_clear=payload.get("LineOfSightClear"),
+            note=str(payload.get("Note", "")),
+        )
+
+
+@dataclass
+class EnvironmentSummary:
+    current_biome: str
+    foot_block_name: str
+    foot_block_id: Any
+    indoors_hint: Optional[bool]
+    water_nearby_hint: Optional[bool]
+    fall_hazard_ahead_hint: Optional[bool]
+    local_height_span: Optional[float]
+    note: str
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "EnvironmentSummary":
+        payload = payload or {}
+        return cls(
+            current_biome=str(payload.get("CurrentBiome", "Unknown")),
+            foot_block_name=str(payload.get("FootBlockName", "Unknown")),
+            foot_block_id=payload.get("FootBlockId"),
+            indoors_hint=_maybe_bool(payload.get("IndoorsHint")),
+            water_nearby_hint=_maybe_bool(payload.get("WaterNearbyHint")),
+            fall_hazard_ahead_hint=_maybe_bool(payload.get("FallHazardAheadHint")),
+            local_height_span=_maybe_float(payload.get("LocalHeightSpan")),
+            note=str(payload.get("Note", "")),
+        )
+
+
+@dataclass
+class BiomeInfo:
+    current_biome: str
+    biome_intensity: Any
+    indoors_hint: Optional[bool]
+    hazard_hint: str
+    note: str
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "BiomeInfo":
+        payload = payload or {}
+        return cls(
+            current_biome=str(payload.get("CurrentBiome", "Unknown")),
+            biome_intensity=payload.get("BiomeIntensity"),
+            indoors_hint=_maybe_bool(payload.get("IndoorsHint")),
+            hazard_hint=str(payload.get("HazardHint", "Unknown")),
+            note=str(payload.get("Note", "")),
+        )
+
+
+@dataclass
+class TerrainSummary:
+    sample_center: Optional[Vector3State]
+    sample_radius: float
+    min_ground_y: float
+    max_ground_y: float
+    height_span: float
+    foot_block_name: str
+    foot_block_id: Any
+    water_nearby_hint: Optional[bool]
+    fall_hazard_ahead_hint: Optional[bool]
+    indoors_hint: Optional[bool]
+    note: str
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "TerrainSummary":
+        payload = payload or {}
+        return cls(
+            sample_center=Vector3State.from_dict(payload.get("SampleCenter")),
+            sample_radius=float(payload.get("SampleRadius", 0.0)),
+            min_ground_y=float(payload.get("MinGroundY", 0.0)),
+            max_ground_y=float(payload.get("MaxGroundY", 0.0)),
+            height_span=float(payload.get("HeightSpan", 0.0)),
+            foot_block_name=str(payload.get("FootBlockName", "Unknown")),
+            foot_block_id=payload.get("FootBlockId"),
+            water_nearby_hint=_maybe_bool(payload.get("WaterNearbyHint")),
+            fall_hazard_ahead_hint=_maybe_bool(payload.get("FallHazardAheadHint")),
+            indoors_hint=_maybe_bool(payload.get("IndoorsHint")),
+            note=str(payload.get("Note", "")),
+        )
+
+
+@dataclass
+class ResourceCandidateQueryResult:
+    center: Optional[Vector3State]
+    radius: float
+    max_results: int
+    sort_by: str
+    count: int
+    ignored_filters: List[str]
+    candidates: List[ResourceCandidateObservation]
+    note: str
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "ResourceCandidateQueryResult":
+        payload = payload or {}
+        return cls(
+            center=Vector3State.from_dict(payload.get("Center")),
+            radius=float(payload.get("Radius", 0.0)),
+            max_results=int(payload.get("MaxResults", 0)),
+            sort_by=str(payload.get("SortBy", "distance")),
+            count=int(payload.get("Count", 0)),
+            ignored_filters=[str(item) for item in payload.get("IgnoredFilters", [])],
+            candidates=[ResourceCandidateObservation.from_dict(item) for item in payload.get("Candidates", [])],
+            note=str(payload.get("Note", "")),
+        )
+
+
+@dataclass
+class InteractableQueryResult:
+    center: Optional[Vector3State]
+    radius: float
+    max_results: int
+    count: int
+    ignored_filters: List[str]
+    interactables: List[InteractableObservation]
+    note: str
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "InteractableQueryResult":
+        payload = payload or {}
+        return cls(
+            center=Vector3State.from_dict(payload.get("Center")),
+            radius=float(payload.get("Radius", 0.0)),
+            max_results=int(payload.get("MaxResults", 0)),
+            count=int(payload.get("Count", 0)),
+            ignored_filters=[str(item) for item in payload.get("IgnoredFilters", [])],
+            interactables=[InteractableObservation.from_dict(item) for item in payload.get("Interactables", [])],
+            note=str(payload.get("Note", "")),
+        )
+
+
+@dataclass
+class EntityQueryResult:
+    center: Optional[Vector3State]
+    radius: float
+    max_results: int
+    count: int
+    ignored_filters: List[str]
+    entities: List[EntityObservation]
+    note: str
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "EntityQueryResult":
+        payload = payload or {}
+        return cls(
+            center=Vector3State.from_dict(payload.get("Center")),
+            radius=float(payload.get("Radius", 0.0)),
+            max_results=int(payload.get("MaxResults", 0)),
+            count=int(payload.get("Count", 0)),
+            ignored_filters=[str(item) for item in payload.get("IgnoredFilters", [])],
+            entities=[EntityObservation.from_dict(item) for item in payload.get("Entities", [])],
+            note=str(payload.get("Note", "")),
+        )
+
+
+@dataclass
+class NearbyResourceCandidatesSummary:
+    count: int
+    top_candidates: List[ResourceCandidateObservation]
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "NearbyResourceCandidatesSummary":
+        payload = payload or {}
+        return cls(
+            count=int(payload.get("Count", 0)),
+            top_candidates=[ResourceCandidateObservation.from_dict(item) for item in payload.get("TopCandidates", [])],
+        )
+
+
+@dataclass
+class NearbyInteractablesSummary:
+    count: int
+    top_interactables: List[InteractableObservation]
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "NearbyInteractablesSummary":
+        payload = payload or {}
+        return cls(
+            count=int(payload.get("Count", 0)),
+            top_interactables=[InteractableObservation.from_dict(item) for item in payload.get("TopInteractables", [])],
+        )
+
+
+@dataclass
+class NearbyEntitiesSummary:
+    hostile_count: int
+    npc_count: int
+    nearest_hostile_distance: Optional[float]
+    top_entities: List[EntityObservation]
+
+    @classmethod
+    def from_dict(cls, payload: Optional[Dict[str, Any]]) -> "NearbyEntitiesSummary":
+        payload = payload or {}
+        return cls(
+            hostile_count=int(payload.get("HostileCount", 0)),
+            npc_count=int(payload.get("NpcCount", 0)),
+            nearest_hostile_distance=_maybe_float(payload.get("NearestHostileDistance")),
+            top_entities=[EntityObservation.from_dict(item) for item in payload.get("TopEntities", [])],
+        )
+
+
+@dataclass
 class PlayerState:
     position: Optional[Vector3State]
     rotation: Optional[RotationState]
@@ -65,7 +513,7 @@ class PlayerState:
         return cls(
             position=Vector3State.from_dict(payload.get("Position")),
             rotation=RotationState.from_dict(payload.get("Rotation")),
-            alive=payload.get("Alive"),
+            alive=_maybe_bool(payload.get("Alive")),
             is_dead=_maybe_bool(payload.get("IsDead")),
             death_screen_visible=_maybe_bool(payload.get("DeathScreenVisible")),
             respawn_available=_maybe_bool(payload.get("RespawnAvailable")),
@@ -207,6 +655,10 @@ class BridgeState:
     ui: UiState
     input_state: InputState
     availability: Availability
+    resource_observation: ResourceObservation
+    nearby_resource_candidates_summary: NearbyResourceCandidatesSummary
+    nearby_interactables_summary: NearbyInteractablesSummary
+    nearby_entities_summary: NearbyEntitiesSummary
 
     @classmethod
     def from_dict(cls, payload: Dict[str, Any]) -> "BridgeState":
@@ -216,6 +668,10 @@ class BridgeState:
             ui=UiState.from_dict(payload.get("Ui")),
             input_state=InputState.from_dict(payload.get("InputState")),
             availability=Availability.from_dict(payload.get("Availability")),
+            resource_observation=ResourceObservation.from_dict(payload.get("ResourceObservation")),
+            nearby_resource_candidates_summary=NearbyResourceCandidatesSummary.from_dict(payload.get("NearbyResourceCandidatesSummary")),
+            nearby_interactables_summary=NearbyInteractablesSummary.from_dict(payload.get("NearbyInteractablesSummary")),
+            nearby_entities_summary=NearbyEntitiesSummary.from_dict(payload.get("NearbyEntitiesSummary")),
         )
 
 
@@ -315,8 +771,8 @@ class PlayerPositionResult:
     @classmethod
     def from_dict(cls, payload: Dict[str, Any]) -> "PlayerPositionResult":
         return cls(
-            position=Vector3State.from_dict(payload.get("position") or payload.get("Position")),
-            available=bool(payload.get("available", payload.get("Available", False))),
+            position=Vector3State.from_dict(payload.get("Position")),
+            available=bool(payload.get("Available", False)),
         )
 
 
@@ -328,8 +784,8 @@ class PlayerRotationResult:
     @classmethod
     def from_dict(cls, payload: Dict[str, Any]) -> "PlayerRotationResult":
         return cls(
-            rotation=RotationState.from_dict(payload.get("rotation") or payload.get("Rotation")),
-            available=bool(payload.get("available", payload.get("Available", False))),
+            rotation=RotationState.from_dict(payload.get("Rotation")),
+            available=bool(payload.get("Available", False)),
         )
 
 

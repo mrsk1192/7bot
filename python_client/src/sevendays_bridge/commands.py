@@ -43,6 +43,10 @@ TAP_ACTIONS = {
     "cancel": "cancel",
     "toggle_flashlight": "toggle_flashlight",
     "console_toggle": "console_toggle",
+}
+
+# Direct API call actions — no press/release concept, sent straight via run_action().
+API_ACTIONS = {
     "respawn_default": "respawn_select_default",
     "respawn_bedroll": "respawn_at_bedroll",
     "respawn_near_bedroll": "respawn_near_bedroll",
@@ -69,3 +73,9 @@ def resolve_tap(name: str) -> str:
     if name not in TAP_ACTIONS:
         raise ValueError(f"'{name}' is not a tap action")
     return TAP_ACTIONS[name]
+
+
+def resolve_api_action(name: str) -> str:
+    if name not in API_ACTIONS:
+        raise ValueError(f"'{name}' is not a direct API action")
+    return API_ACTIONS[name]

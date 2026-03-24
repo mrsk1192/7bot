@@ -12,14 +12,23 @@ from urllib.request import Request, urlopen
 
 from . import commands
 from .exceptions import BridgeApiError, BridgeConnectionError, BridgeProtocolError
+from .ws_subscriber import WebSocketSubscriber
 from .models import (
+    BiomeInfo,
     BridgeEnvelope,
     BridgeState,
     CapabilitySet,
+    EntityQueryResult,
+    EnvironmentSummary,
     InputActionResult,
+    InteractionContextObservation,
+    InteractableQueryResult,
+    LookTargetObservation,
     LogsTailResult,
     PlayerPositionResult,
     PlayerRotationResult,
+    ResourceCandidateQueryResult,
+    TerrainSummary,
     VersionInfo,
 )
 
@@ -31,6 +40,8 @@ class SevenDaysBridgeClient:
         port: int = 18771,
         timeout_seconds: float = 5.0,
         log_file: Optional[Path] = None,
+        ws_port: int = 18772,
+        use_websocket: bool = False,
     ) -> None:
         if host != "127.0.0.1":
             raise ValueError("Phase 2 client only allows 127.0.0.1.")
@@ -43,6 +54,12 @@ class SevenDaysBridgeClient:
         self.base_url = f"http://{host}:{port}"
         self.logger = _build_logger(log_file)
         self.logger.info("Client initialized. base_url=%s timeout=%s", self.base_url, self.timeout_seconds)
+
+        self._ws: Optional[WebSocketSubscriber] = None
+        if use_websocket:
+            self._ws = WebSocketSubscriber()
+            self._ws.connect(host=host, port=ws_port)
+            self.logger.info("WebSocket subscriber connected. ws_port=%s", ws_port)
 
     def ping(self) -> Dict[str, Any]:
         return self._request("GET", "/api/ping").data
@@ -65,6 +82,42 @@ class SevenDaysBridgeClient:
     def get_logs_tail(self, lines: int = 50) -> LogsTailResult:
         query = urlencode({"lines": lines})
         return LogsTailResult.from_dict(self._request("GET", f"/api/get_logs_tail?{query}").data)
+
+    def get_look_target(self) -> LookTargetObservation:
+        return LookTargetObservation.from_dict(self._request("GET", "/api/get_look_target").data)
+
+    def get_interaction_context(self) -> InteractionContextObservation:
+        return InteractionContextObservation.from_dict(self._request("GET", "/api/get_interaction_context").data)
+
+    def query_resource_candidates(self, **arguments: Any) -> ResourceCandidateQueryResult:
+        query = urlencode(self._normalize_query_arguments(arguments), doseq=True)
+        path = "/api/query_resource_candidates"
+        if query:
+            path = f"{path}?{query}"
+        return ResourceCandidateQueryResult.from_dict(self._request("GET", path).data)
+
+    def query_interactables_in_radius(self, **arguments: Any) -> InteractableQueryResult:
+        query = urlencode(self._normalize_query_arguments(arguments), doseq=True)
+        path = "/api/query_interactables_in_radius"
+        if query:
+            path = f"{path}?{query}"
+        return InteractableQueryResult.from_dict(self._request("GET", path).data)
+
+    def query_entities_in_radius(self, **arguments: Any) -> EntityQueryResult:
+        query = urlencode(self._normalize_query_arguments(arguments), doseq=True)
+        path = "/api/query_entities_in_radius"
+        if query:
+            path = f"{path}?{query}"
+        return EntityQueryResult.from_dict(self._request("GET", path).data)
+
+    def get_environment_summary(self) -> EnvironmentSummary:
+        return EnvironmentSummary.from_dict(self._request("GET", "/api/get_environment_summary").data)
+
+    def get_biome_info(self) -> BiomeInfo:
+        return BiomeInfo.from_dict(self._request("GET", "/api/get_biome_info").data)
+
+    def get_terrain_summary(self) -> TerrainSummary:
+        return TerrainSummary.from_dict(self._request("GET", "/api/get_terrain_summary").data)
 
     def command(self, command: str, arguments: Optional[Dict[str, Any]] = None) -> BridgeEnvelope:
         return self._request("POST", "/api/command", {"Command": command, "Arguments": arguments or {}})
@@ -184,7 +237,7 @@ class SevenDaysBridgeClient:
     def respawn_cancel(self) -> InputActionResult:
         return self.run_action("respawn_cancel")
 
-    def _respawn_action_with_retry(self, action: str, max_retries: int = 10) -> "InputActionResult":
+    def _respawn_action_with_retry(self, action: str, max_retries: int = 300) -> "InputActionResult":
         from .exceptions import BridgeApiError, BridgeConnectionError
         for attempt in range(max_retries + 1):
             try:
@@ -202,10 +255,38 @@ class SevenDaysBridgeClient:
         raise RuntimeError("Respawn retry exhausted")
 
     def wait_for_respawn_screen(self, timeout_ms: int = 15000) -> InputActionResult:
+        if self._ws is not None:
+            self.logger.info("wait_for_respawn_screen: using WebSocket event (timeout_ms=%d)", timeout_ms)
+            event = self._ws.wait_for_event("death", timeout_ms=timeout_ms)
+            return InputActionResult(accepted=True, note="death event received via WebSocket", error=None)
         return self.run_action("wait_for_respawn_screen", timeout_ms=timeout_ms)
 
     def wait_until_respawned(self, timeout_ms: int = 30000) -> InputActionResult:
+        if self._ws is not None:
+            self.logger.info("wait_until_respawned: using WebSocket event (timeout_ms=%d)", timeout_ms)
+            event = self._ws.wait_for_event("respawn_complete", timeout_ms=timeout_ms)
+            return InputActionResult(accepted=True, note="respawn_complete event received via WebSocket", error=None)
         return self.run_action("wait_for_respawn_complete", timeout_ms=timeout_ms)
+
+    def _normalize_query_arguments(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
+        normalized: Dict[str, Any] = {}
+        for key, value in arguments.items():
+            if key == "center" and value is not None:
+                if isinstance(value, dict):
+                    normalized["x"] = value.get("x", value.get("X"))
+                    normalized["y"] = value.get("y", value.get("Y"))
+                    normalized["z"] = value.get("z", value.get("Z"))
+                    continue
+
+                if hasattr(value, "x") and hasattr(value, "y") and hasattr(value, "z"):
+                    normalized["x"] = getattr(value, "x")
+                    normalized["y"] = getattr(value, "y")
+                    normalized["z"] = getattr(value, "z")
+                    continue
+
+            normalized[key] = value
+
+        return normalized
 
     def _request(
         self,
