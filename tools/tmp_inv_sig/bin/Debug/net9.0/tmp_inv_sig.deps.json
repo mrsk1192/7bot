@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "tmp_inv_sig/1.0.0": {
+        "runtime": {
+          "tmp_inv_sig.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "tmp_inv_sig/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

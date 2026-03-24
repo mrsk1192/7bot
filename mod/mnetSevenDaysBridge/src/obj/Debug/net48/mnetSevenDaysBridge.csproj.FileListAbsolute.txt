@@ -1,0 +1,8 @@
+c:\AI\7agent2\mod\mnetSevenDaysBridge\build\bin\net48\mnetSevenDaysBridge.dll
+c:\AI\7agent2\mod\mnetSevenDaysBridge\build\bin\net48\mnetSevenDaysBridge.pdb
+c:\AI\7agent2\mod\mnetSevenDaysBridge\src\obj\Debug\net48\mnetSevenDaysBridge.csproj.AssemblyReference.cache
+c:\AI\7agent2\mod\mnetSevenDaysBridge\src\obj\Debug\net48\mnetSevenDaysBridge.GeneratedMSBuildEditorConfig.editorconfig
+c:\AI\7agent2\mod\mnetSevenDaysBridge\src\obj\Debug\net48\mnetSevenDaysBridge.csproj.CoreCompileInputs.cache
+c:\AI\7agent2\mod\mnetSevenDaysBridge\src\obj\Debug\net48\mnetSevenDaysBridge.sourcelink.json
+c:\AI\7agent2\mod\mnetSevenDaysBridge\src\obj\Debug\net48\mnetSevenDaysBridge.dll
+c:\AI\7agent2\mod\mnetSevenDaysBridge\src\obj\Debug\net48\mnetSevenDaysBridge.pdb

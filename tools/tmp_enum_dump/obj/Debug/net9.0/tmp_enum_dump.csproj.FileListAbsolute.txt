@@ -1,0 +1,15 @@
+C:\AI\7agent2\tools\tmp_enum_dump\bin\Debug\net9.0\tmp_enum_dump.exe
+C:\AI\7agent2\tools\tmp_enum_dump\bin\Debug\net9.0\tmp_enum_dump.deps.json
+C:\AI\7agent2\tools\tmp_enum_dump\bin\Debug\net9.0\tmp_enum_dump.runtimeconfig.json
+C:\AI\7agent2\tools\tmp_enum_dump\bin\Debug\net9.0\tmp_enum_dump.dll
+C:\AI\7agent2\tools\tmp_enum_dump\bin\Debug\net9.0\tmp_enum_dump.pdb
+C:\AI\7agent2\tools\tmp_enum_dump\obj\Debug\net9.0\tmp_enum_dump.GeneratedMSBuildEditorConfig.editorconfig
+C:\AI\7agent2\tools\tmp_enum_dump\obj\Debug\net9.0\tmp_enum_dump.AssemblyInfoInputs.cache
+C:\AI\7agent2\tools\tmp_enum_dump\obj\Debug\net9.0\tmp_enum_dump.AssemblyInfo.cs
+C:\AI\7agent2\tools\tmp_enum_dump\obj\Debug\net9.0\tmp_enum_dump.csproj.CoreCompileInputs.cache
+C:\AI\7agent2\tools\tmp_enum_dump\obj\Debug\net9.0\tmp_enum_dump.sourcelink.json
+C:\AI\7agent2\tools\tmp_enum_dump\obj\Debug\net9.0\tmp_enum_dump.dll
+C:\AI\7agent2\tools\tmp_enum_dump\obj\Debug\net9.0\refint\tmp_enum_dump.dll
+C:\AI\7agent2\tools\tmp_enum_dump\obj\Debug\net9.0\tmp_enum_dump.pdb
+C:\AI\7agent2\tools\tmp_enum_dump\obj\Debug\net9.0\tmp_enum_dump.genruntimeconfig.cache
+C:\AI\7agent2\tools\tmp_enum_dump\obj\Debug\net9.0\ref\tmp_enum_dump.dll

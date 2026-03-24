@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "host": "127.0.0.1",
+  "port": 18771,
+  "communication_mode": "http_polling",
+  "log_level": "info",
+  "max_log_lines_in_memory": 2000,
+  "request_timeout_ms": 5000,
+  "max_commands_per_second": 120,
+  "max_command_queue_length": 256,
+  "default_look_step": 12.0,
+  "enable_os_input_backend": true,
+  "bring_game_window_to_front_for_os_input": true,
+  "auto_quick_continue_on_startup": true,
+  "auto_quick_continue_game_world": "Pregen08k01",
+  "auto_quick_continue_game_name": "VanillaDiagClientOnly"
+}

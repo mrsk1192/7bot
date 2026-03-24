@@ -1,0 +1,344 @@
+﻿{
+  "/api/get_version": {
+    "Ok": true,
+    "Command": "get_version",
+    "TimestampUtc": "2026-03-23T03:01:30.0382479Z",
+    "Data": {
+      "BridgeVersion": "0.4.0.0",
+      "CommunicationMode": "http_polling",
+      "Host": "127.0.0.1",
+      "Port": 18771,
+      "ModApiEntryPoint": "IModApi.InitMod(Mod)",
+      "Runtime": "4.0.30319.42000",
+      "ActiveBackend": "hybrid"
+    },
+    "Error": null
+  },
+  "/api/get_state": {
+    "Ok": true,
+    "Command": "get_state",
+    "TimestampUtc": "2026-03-23T03:01:30.9510040Z",
+    "Data": {
+      "Player": {
+        "Position": {
+          "X": -276.328,
+          "Y": 43.89191,
+          "Z": 908.6949
+        },
+        "Rotation": {
+          "Yaw": 344.8532,
+          "Pitch": 0
+        },
+        "Alive": true,
+        "IsDead": false,
+        "DeathScreenVisible": false,
+        "RespawnAvailable": false,
+        "RespawnCooldownSeconds": null,
+        "LastDeathTime": null,
+        "LastDeathPosition": null,
+        "BedrollSpawnAvailable": true,
+        "NearestSpawnOptionSummary": "Invalid -> (0.0, 0.0, 0.0)",
+        "RespawnInProgress": false,
+        "JustRespawned": false,
+        "Hp": 100,
+        "MaxHp": 100,
+        "Stamina": 100,
+        "MaxStamina": 100,
+        "Food": 98.13112,
+        "Water": 97.69817,
+        "SelectedHotbarSlot": 0,
+        "HoldingLight": false
+      },
+      "Game": {
+        "TimeOfDay": 312304,
+        "Day": 14,
+        "Biome": "pine_forest"
+      },
+      "Ui": {
+        "HudAvailable": true,
+        "MenuOpen": false,
+        "InventoryOpen": false,
+        "MapOpen": false,
+        "QuestLogOpen": null,
+        "ConsoleOpen": false,
+        "PauseMenuOpen": false,
+        "DeathScreenOpen": false,
+        "RespawnScreenOpen": false,
+        "RespawnConfirmationOpen": false,
+        "Note": "Quest UI detection uses grouped quest windows. Console state uses GameManager GUI console when available."
+      },
+      "InputState": {
+        "InputReadable": true,
+        "MovementLocked": false,
+        "MoveForward": false,
+        "MoveBack": false,
+        "MoveLeft": false,
+        "MoveRight": false,
+        "Sprint": false,
+        "Crouch": false,
+        "PrimaryAction": false,
+        "SecondaryAction": false,
+        "HoldInteract": false,
+        "AutoRun": false,
+        "Note": "Bridge-held input state machine view."
+      },
+      "Availability": {
+        "PlayerAvailable": true,
+        "PositionAvailable": true,
+        "RotationAvailable": true,
+        "VitalsAvailable": true,
+        "TimeAvailable": true,
+        "BiomeAvailable": true,
+        "InputBackendAvailable": true,
+        "UiStateAvailable": true,
+        "RespawnStateAvailable": true
+      },
+      "ResourceObservation": {
+        "PlayerPosition": {
+          "X": -276.328,
+          "Y": 43.89191,
+          "Z": 908.6949
+        },
+        "PlayerRotation": {
+          "Yaw": 344.8532,
+          "Pitch": 0
+        },
+        "Biome": "pine_forest",
+        "LookTarget": {
+          "HasTarget": false,
+          "Source": "raycast",
+          "TargetKind": "none",
+          "TargetName": "Unknown",
+          "TargetClass": "Unknown",
+          "TargetId": "Unknown",
+          "EntityId": null,
+          "BlockId": null,
+          "Distance": 0,
+          "Position": {
+            "X": -277.942,
+            "Y": 45.1925,
+            "Z": 914.6553
+          },
+          "CanInteract": false,
+          "InteractionPromptText": "Unknown",
+          "InteractionActionKind": "none",
+          "Hostile": false,
+          "Alive": false,
+          "Locked": "unknown",
+          "Powered": "unknown",
+          "Active": "unknown",
+          "LineOfSightClear": "unknown",
+          "IsResourceCandidate": false,
+          "CandidateCategory": "unknown",
+          "CandidateConfidence": 0,
+          "LikelyResourceType": "unknown",
+          "Durability": "unknown",
+          "MaxDurability": "unknown",
+          "Note": "No focused target was hit by the look ray."
+        },
+        "InteractionContext": {
+          "HasFocusTarget": false,
+          "CanInteractNow": false,
+          "SuggestedActionKind": "none",
+          "PromptText": "Unknown",
+          "TargetKind": "none",
+          "TargetName": "Unknown",
+          "Distance": 0,
+          "Source": "raycast",
+          "RequiresPreciseAlignment": false,
+          "RecommendedInteractDistanceMin": "unknown",
+          "RecommendedInteractDistanceMax": "unknown",
+          "Note": "There was no current focus target."
+        },
+        "Availability": {
+          "LookTargetAvailable": true,
+          "InteractionContextAvailable": true,
+          "ResourceQueryAvailable": true,
+          "InteractableQueryAvailable": true,
+          "EntityQueryAvailable": true,
+          "EnvironmentSummaryAvailable": true,
+          "BiomeInfoAvailable": true,
+          "TerrainSummaryAvailable": true,
+          "Note": "Phase 4 observation pipeline is active."
+        }
+      },
+      "NearbyResourceCandidatesSummary": {
+        "Count": 5,
+        "TopCandidates": [
+          {
+            "Name": "treeTallGrassDiagonal",
+            "BlockId": 24199,
+            "Position": {
+              "X": -276.5,
+              "Y": 44.5,
+              "Z": 908.5
+            },
+            "Distance": 0.6613363,
+            "CandidateCategory": "surface_resource_node",
+            "CandidateConfidence": 0.94,
+            "LikelyResourceType": "wood",
+            "IsExposed": true,
+            "Biome": "pine_forest",
+            "LineOfSightClear": true,
+            "ReachableHint": true,
+            "Note": "Candidate classified as a wood/harvest resource."
+          },
+          {
+            "Name": "treeTallGrassDiagonal",
+            "BlockId": 24199,
+            "Position": {
+              "X": -276.5,
+              "Y": 44.5,
+              "Z": 909.5
+            },
+            "Distance": 1.023461,
+            "CandidateCategory": "surface_resource_node",
+            "CandidateConfidence": 0.94,
+            "LikelyResourceType": "wood",
+            "IsExposed": true,
+            "Biome": "pine_forest",
+            "LineOfSightClear": false,
+            "ReachableHint": true,
+            "Note": "Candidate classified as a wood/harvest resource."
+          },
+          {
+            "Name": "treeTallGrassDiagonal",
+            "BlockId": 24199,
+            "Position": {
+              "X": -275.5,
+              "Y": 44.5,
+              "Z": 908.5
+            },
+            "Distance": 1.045615,
+            "CandidateCategory": "surface_resource_node",
+            "CandidateConfidence": 0.94,
+            "LikelyResourceType": "wood",
+            "IsExposed": true,
+            "Biome": "pine_forest",
+            "LineOfSightClear": false,
+            "ReachableHint": true,
+            "Note": "Candidate classified as a wood/harvest resource."
+          },
+          {
+            "Name": "treeTallGrassDiagonal",
+            "BlockId": 24199,
+            "Position": {
+              "X": -275.5,
+              "Y": 44.5,
+              "Z": 909.5
+            },
+            "Distance": 1.305151,
+            "CandidateCategory": "surface_resource_node",
+            "CandidateConfidence": 0.94,
+            "LikelyResourceType": "wood",
+            "IsExposed": true,
+            "Biome": "pine_forest",
+            "LineOfSightClear": false,
+            "ReachableHint": true,
+            "Note": "Candidate classified as a wood/harvest resource."
+          },
+          {
+            "Name": "treeTallGrassDiagonal",
+            "BlockId": 24199,
+            "Position": {
+              "X": -277.5,
+              "Y": 44.5,
+              "Z": 908.5
+            },
+            "Distance": 1.334699,
+            "CandidateCategory": "surface_resource_node",
+            "CandidateConfidence": 0.94,
+            "LikelyResourceType": "wood",
+            "IsExposed": true,
+            "Biome": "pine_forest",
+            "LineOfSightClear": false,
+            "ReachableHint": true,
+            "Note": "Candidate classified as a wood/harvest resource."
+          }
+        ]
+      },
+      "NearbyInteractablesSummary": {
+        "Count": 0,
+        "TopInteractables": []
+      },
+      "NearbyEntitiesSummary": {
+        "HostileCount": 0,
+        "NpcCount": 0,
+        "NearestHostileDistance": null,
+        "TopEntities": []
+      }
+    },
+    "Error": null
+  },
+  "/api/get_player_rotation": {
+    "Ok": true,
+    "Command": "get_player_rotation",
+    "TimestampUtc": "2026-03-23T03:01:30.9583782Z",
+    "Data": {
+      "rotation": {
+        "Yaw": 344.8532,
+        "Pitch": 0
+      },
+      "available": true
+    },
+    "Error": null
+  },
+  "/api/get_look_target": {
+    "Ok": true,
+    "Command": "get_look_target",
+    "TimestampUtc": "2026-03-23T03:01:31.0587966Z",
+    "Data": {
+      "HasTarget": false,
+      "Source": "raycast",
+      "TargetKind": "none",
+      "TargetName": "Unknown",
+      "TargetClass": "Unknown",
+      "TargetId": "Unknown",
+      "EntityId": null,
+      "BlockId": null,
+      "Distance": 0,
+      "Position": {
+        "X": -277.9421,
+        "Y": 45.19251,
+        "Z": 914.6553
+      },
+      "CanInteract": false,
+      "InteractionPromptText": "Unknown",
+      "InteractionActionKind": "none",
+      "Hostile": false,
+      "Alive": false,
+      "Locked": "unknown",
+      "Powered": "unknown",
+      "Active": "unknown",
+      "LineOfSightClear": "unknown",
+      "IsResourceCandidate": false,
+      "CandidateCategory": "unknown",
+      "CandidateConfidence": 0,
+      "LikelyResourceType": "unknown",
+      "Durability": "unknown",
+      "MaxDurability": "unknown",
+      "Note": "No focused target was hit by the look ray."
+    },
+    "Error": null
+  },
+  "/api/get_interaction_context": {
+    "Ok": true,
+    "Command": "get_interaction_context",
+    "TimestampUtc": "2026-03-23T03:01:31.1842879Z",
+    "Data": {
+      "HasFocusTarget": false,
+      "CanInteractNow": false,
+      "SuggestedActionKind": "none",
+      "PromptText": "Unknown",
+      "TargetKind": "none",
+      "TargetName": "Unknown",
+      "Distance": 0,
+      "Source": "raycast",
+      "RequiresPreciseAlignment": false,
+      "RecommendedInteractDistanceMin": "unknown",
+      "RecommendedInteractDistanceMax": "unknown",
+      "Note": "There was no current focus target."
+    },
+    "Error": null
+  }
+}

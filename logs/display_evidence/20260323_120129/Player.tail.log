@@ -1,0 +1,300 @@
+﻿GameStat.ScoreZombieKillMultiplier = 1
+GameStat.ShowAllPlayersOnMap = False
+GameStat.ShowFriendPlayerOnMap = True
+GameStat.ShowSpawnWindow = False
+GameStat.ShowWindow = 
+GameStat.StormFreq = 0
+GameStat.TimeLimitActive = False
+GameStat.TimeLimitThisRound = 0
+GameStat.TimeOfDayIncPerSec = 20
+GameStat.TwitchBloodMoonAllowed = True
+GameStat.UNUSED_ShowZombieCounter = 
+GameStat.XPMultiplier = 100
+GameStat.ZombieHordeMeter = False
+2026-03-23T11:57:09 16.225 INF StartAsServer
+2026-03-23T11:57:09 16.676 INF LoadTextureArraysForQuality took 1.553
+2026-03-23T11:57:09 16.717 INF Loaded (local): events in 0.09
+2026-03-23T11:57:10 16.925 ERR Event with the same name 'easter' already defined
+2026-03-23T11:57:10 16.926 ERR Event with the same name 'christmas' already defined
+2026-03-23T11:57:10 16.926 ERR Event with the same name 'halloween' already defined
+2026-03-23T11:57:10 16.926 ERR Event with the same name 'thanksgiving' already defined
+2026-03-23T11:57:10 16.970 INF Loaded (local): events in 0.09
+2026-03-23T11:57:10 17.438 INF Loaded (local): rwgmixer in 0.18
+2026-03-23T11:57:10 17.618 INF Set Microsplat diffuse: MicroSplatConfig_diff_tarray (UnityEngine.Texture2DArray)
+2026-03-23T11:57:10 17.619 INF Set Microsplat normals: MicroSplatConfig_normal_tarray (UnityEngine.Texture2DArray)
+2026-03-23T11:57:10 17.619 INF Set Microsplat smooth:  MicroSplatConfig_smoothAO_tarray (UnityEngine.Texture2DArray)
+2026-03-23T11:57:10 17.721 INF Loaded (local): materials in 0.66
+2026-03-23T11:57:11 17.878 INF Loaded (local): archetypes in 0.12
+2026-03-23T11:57:11 18.052 INF Loaded (local): physicsbodies in 0.09
+2026-03-23T11:57:11 18.173 INF Loaded (local): loadingscreen in 0.08
+2026-03-23T11:57:11 18.282 INF [Discord] Saving settings with DiscordDisabled=False
+2026-03-23T11:57:11 18.299 INF [Discord] Logged in
+2026-03-23T11:57:11 18.300 WRN [Discord][Log] RPC manager reset: RPC manager connecting with new client ID Status:0 (rpc_manager.cpp:130)
+2026-03-23T11:57:11 18.387 INF Loaded (local): painting in 0.12
+2026-03-23T11:57:11 18.478 INF Added 1336 subtitle data entries and 3 speaker colors
+2026-03-23T11:57:11 18.536 INF Loaded (local): subtitles in 0.11
+2026-03-23T11:57:11 18.831 INF Loaded (local): shapes in 0.10
+2026-03-23T11:57:12 18.922 INF Loaded (local): videos in 0.09
+2026-03-23T11:57:12 18.923 INF WorldStaticData.Init() needed 8.000s
+2026-03-23T11:57:12 18.975 INF [Steamworks.NET] Already logged in
+2026-03-23T11:57:12 18.975 INF [EOS] Login already done.
+2026-03-23T11:57:12 18.976 INF [BACKTRACE] Attempting to get User ID from platform: EOS
+2026-03-23T11:57:12 18.978 INF [EOS] Created RFS Request: NewsFeatured.xml
+2026-03-23T11:57:12 18.980 INF [EOS] Created RFS Request: News.xml
+2026-03-23T11:57:12 18.997 INF [EOS] Created RFS Request: DLCConfiguration
+2026-03-23T11:57:12 18.998 INF [EOS] Created RFS Request: eula_japanese
+2026-03-23T11:57:12 18.998 INF [PermissionsManager] ResolvePermissions(_perms: [All], _canPrompt: False)
+2026-03-23T11:57:12 19.074 INF [PermissionsManager] ResolvePermissions(_perms: [All], _canPrompt: False) Fetching Title Storage Overrides...
+2026-03-23T11:57:12 19.076 INF [EOS] Created RFS Request: PlatformOverrides
+2026-03-23T11:57:12 19.118 INF [EOS] ResolvePermissions(_perms: [All], _canPrompt: False)
+2026-03-23T11:57:12 19.726 INF [EOS] Read (BlockedPlayerList) completed: Success, received 142 bytes
+2026-03-23T11:57:12 19.826 INF [EOS] found external account for 000284397ae3413d8bf4003e874f823c: Type: Steam, Id: 76561198077663007
+2026-03-23T11:57:13 19.923 INF [EOS] Read (NewsFeatured.xml) completed: Success, received 1409 bytes
+2026-03-23T11:57:13 19.925 INF [EOS] Created RFS Request: news_featured_ytz2.1.jpg
+2026-03-23T11:57:13 19.925 INF [EOS] Created RFS Request: news_featured_tfpmerch.jpg
+2026-03-23T11:57:13 19.925 INF [EOS] Created RFS Request: news_featured_soundtrack.jpg
+2026-03-23T11:57:13 20.212 INF [EOS] Player may have active sanctions
+2026-03-23T11:57:13 20.212 INF [EOS] SanctionsQuery finished with: 0 sanctions
+2026-03-23T11:57:13 20.213 INF [EOS] CheckSanctionsEnumerator: hasSanctions False
+2026-03-23T11:57:13 20.404 INF [EOS] Read (News.xml) completed: Success, received 9788 bytes
+2026-03-23T11:57:13 20.405 INF [EOS] Created RFS Request: news_game_2025_2.5_stable.jpg
+2026-03-23T11:57:13 20.406 INF [EOS] Created RFS Request: news_game_2.4_stable.jpg
+2026-03-23T11:57:13 20.406 INF [EOS] Created RFS Request: news_game_2.3_stable.jpg
+2026-03-23T11:57:13 20.793 INF [EOS] Read (DLCConfiguration) completed: Success, received 3232 bytes
+2026-03-23T11:57:13 20.795 INF [DLCTitleStorageManager] Successfully retrieved DLC configuration.
+2026-03-23T11:57:13 20.797 INF [EOS] Read (eula_japanese) completed: Success, received 47376 bytes
+2026-03-23T11:57:13 20.838 INF [EOS] Created RFS Request: backtraceconfig.xml
+2026-03-23T11:57:14 20.896 INF [EOS] Read (PlatformOverrides) completed: Success, received 532 bytes
+2026-03-23T11:57:14 20.904 INF [TitleStorageOverridesManager] Successfully retrieved overrides.
+2026-03-23T11:57:14 20.961 INF [PermissionsManager] ResolvePermissions(_perms: [All], _canPrompt: False) Fetched Title Storage Overrides!
+2026-03-23T11:57:14 21.788 INF [EOS] Read (news_featured_ytz2.1.jpg) completed: Success, received 123752 bytes
+2026-03-23T11:57:15 22.027 INF [EOS] Read (news_featured_tfpmerch.jpg) completed: Success, received 78916 bytes
+2026-03-23T11:57:15 22.563 INF [EOS] Read (news_game_2025_2.5_stable.jpg) completed: Success, received 102102 bytes
+2026-03-23T11:57:15 22.565 INF [EOS] Created RFS Request: news_game_2.2_stable.jpg
+2026-03-23T11:57:15 22.687 INF [EOS] Read (news_featured_soundtrack.jpg) completed: Success, received 235045 bytes
+2026-03-23T11:57:15 22.730 INF [EOS] Read (news_game_2.4_stable.jpg) completed: Success, received 87456 bytes
+2026-03-23T11:57:15 22.731 INF [EOS] Created RFS Request: news_game_2.1_stable.jpg
+2026-03-23T11:57:15 22.857 INF [EOS] Read (news_game_2.3_stable.jpg) completed: Success, received 72704 bytes
+2026-03-23T11:57:15 22.858 INF [EOS] Created RFS Request: news_game_06_2.0_stable.jpg
+2026-03-23T11:57:16 22.877 INF [EOS] Read (backtraceconfig.xml) completed: Success, received 2424 bytes
+2026-03-23T11:57:16 22.882 INF [BACKTRACE] Bug reporting Enabled with save uploading: Disabled
+2026-03-23T11:57:16 22.883 INF [BACKTRACE] Save Attaching Feature: Disabled
+2026-03-23T11:57:16 22.884 INF [BACKTRACE] Entire World Attaching Feature: Disabled
+2026-03-23T11:57:16 22.884 INF [BACKTRACE] Bug reporting Disabled with save uploading: Disabled
+2026-03-23T11:57:16 22.884 INF Backtrace Configuration refreshed from XML: Enabled False
+2026-03-23T11:57:16 22.885 INF [BACKTRACE] Bug reporting: Disabled
+2026-03-23T11:57:16 22.885 INF [BACKTRACE] Bug reporting attach save feature: Disabled
+2026-03-23T11:57:16 22.885 INF [BACKTRACE] Bug reporting attach entire world feature: Disabled
+2026-03-23T11:57:17 23.874 INF [EOS] Read (news_game_2.2_stable.jpg) completed: Success, received 96101 bytes
+2026-03-23T11:57:17 23.875 INF [EOS] Created RFS Request: game_news_06_EXP.jpg
+2026-03-23T11:57:17 23.997 INF [EOS] Read (news_game_2.1_stable.jpg) completed: Success, received 95868 bytes
+2026-03-23T11:57:17 24.125 INF [EOS] Read (news_game_06_2.0_stable.jpg) completed: Success, received 96807 bytes
+2026-03-23T11:57:18 25.031 INF [EOS] Read (game_news_06_EXP.jpg) completed: Success, received 110240 bytes
+2026-03-23T11:57:18 25.685 INF [mnetSevenDaysBridge] 2026-03-23T02:57:18.8238858Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:57:21 28.760 INF [mnetSevenDaysBridge] 2026-03-23T02:57:21.8989046Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:57:24 31.818 INF [mnetSevenDaysBridge] 2026-03-23T02:57:24.9565032Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:57:27 34.858 INF [mnetSevenDaysBridge] 2026-03-23T02:57:27.9966660Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:57:31 37.959 INF [mnetSevenDaysBridge] 2026-03-23T02:57:31.0970773Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:57:34 40.971 INF [mnetSevenDaysBridge] 2026-03-23T02:57:34.1093533Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:57:37 44.055 INF [mnetSevenDaysBridge] 2026-03-23T02:57:37.1937011Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:57:40 47.064 INF [mnetSevenDaysBridge] 2026-03-23T02:57:40.2029982Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:57:43 50.070 INF [mnetSevenDaysBridge] 2026-03-23T02:57:43.2087365Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:57:45 52.046 INF Block IDs with mapping
+2026-03-23T11:57:45 52.061 INF Block IDs total 24312, terr 30, last 24533
+2026-03-23T11:57:45 52.082 INF Loaded (local): blocks in 32.61
+2026-03-23T11:57:46 53.131 INF [mnetSevenDaysBridge] 2026-03-23T02:57:46.2693641Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:57:46 53.190 INF Loaded (local): progression in 0.21
+2026-03-23T11:57:46 53.790 INF Loaded (local): buffs in 0.28
+2026-03-23T11:57:47 54.127 INF Loaded (local): misc in 0.10
+2026-03-23T11:57:48 55.668 INF Loaded (local): items in 1.06
+2026-03-23T11:57:49 56.134 INF Item IDs with mapping
+2026-03-23T11:57:49 56.135 INF ItemIDs from Mapping
+2026-03-23T11:57:49 56.141 INF ItemClass assignLeftOverItems 67018 of 81920
+2026-03-23T11:57:49 56.191 INF [mnetSevenDaysBridge] 2026-03-23T02:57:49.3297189Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:57:49 56.304 INF Loaded (local): item_modifiers in 0.17
+2026-03-23T11:57:49 56.756 INF Loaded (local): entityclasses in 0.20
+2026-03-23T11:57:50 57.100 INF Loaded (local): qualityinfo in 0.10
+2026-03-23T11:57:50 57.687 INF Loaded (local): sounds in 0.14
+2026-03-23T11:57:51 58.067 INF Loaded (local): recipes in 0.13
+2026-03-23T11:57:51 58.417 INF Loaded (local): blockplaceholders in 0.11
+2026-03-23T11:57:51 58.856 INF Loaded (local): loot in 0.14
+2026-03-23T11:57:52 59.308 INF [mnetSevenDaysBridge] 2026-03-23T02:57:52.4462097Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:57:52 59.337 INF Loaded (local): entitygroups in 0.11
+2026-03-23T11:57:52 59.669 INF Loaded (local): utilityai in 0.10
+2026-03-23T11:57:53 60.001 INF Loaded (local): vehicles in 0.09
+2026-03-23T11:57:53 60.346 INF Loaded (local): rwgmixer in 0.12
+2026-03-23T11:57:53 60.676 INF Loaded (local): weathersurvival in 0.09
+2026-03-23T11:57:54 61.029 INF Loaded (local): archetypes in 0.10
+2026-03-23T11:57:54 61.466 INF Loaded (local): challenges in 0.13
+2026-03-23T11:57:55 61.940 INF Loaded (local): quests in 0.16
+2026-03-23T11:57:55 62.277 INF Loaded (local): traders in 0.10
+2026-03-23T11:57:55 62.341 INF [mnetSevenDaysBridge] 2026-03-23T02:57:55.4790682Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:57:55 62.628 INF Loaded (local): npc in 0.12
+2026-03-23T11:57:56 62.967 INF Loaded (local): dialogs in 0.10
+2026-03-23T11:57:56 63.358 INF Loaded (local): ui_display in 0.11
+2026-03-23T11:57:56 63.707 INF Loaded (local): nav_objects in 0.11
+2026-03-23T11:57:57 64.055 INF Loaded (local): gamestages in 0.10
+2026-03-23T11:57:58 64.917 INF Loaded (local): gameevents in 0.56
+2026-03-23T11:57:58 65.352 INF Loaded (local): twitch in 0.13
+2026-03-23T11:57:58 65.371 INF [mnetSevenDaysBridge] 2026-03-23T02:57:58.5095646Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:57:58 65.686 INF Loaded (local): twitch_events in 0.10
+2026-03-23T11:57:59 66.066 INF Loaded (local): dmscontent in 0.12
+2026-03-23T11:57:59 66.398 INF Loaded (local): XUi_Common/styles in 0.09
+2026-03-23T11:57:59 66.729 INF Loaded (local): XUi_Common/controls in 0.09
+2026-03-23T11:58:00 67.141 INF Loaded (local): XUi/styles in 0.10
+2026-03-23T11:58:00 67.564 INF Loaded (local): XUi/controls in 0.10
+2026-03-23T11:58:01 67.973 INF Loaded (local): XUi/windows in 0.09
+2026-03-23T11:58:01 68.299 INF [XUi] Loading XUi asynchronously
+2026-03-23T11:58:01 68.336 INF Loaded (local): XUi/xui in 0.13
+2026-03-23T11:58:01 68.403 INF [mnetSevenDaysBridge] 2026-03-23T02:58:01.5410363Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:02 69.489 INF Loaded (local): biomes in 0.37
+2026-03-23T11:58:03 70.604 INF Loaded (local): worldglobal in 0.24
+2026-03-23T11:58:04 71.489 INF [mnetSevenDaysBridge] 2026-03-23T02:58:04.6272940Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:04 71.726 INF [XUi] Parsing all window groups completed in 1095 ms total.
+2026-03-23T11:58:05 71.902 INF Loaded (local): spawning in 0.32
+2026-03-23T11:58:06 73.360 INF Loaded (local): loadingscreen in 0.40
+2026-03-23T11:58:07 74.560 INF [mnetSevenDaysBridge] 2026-03-23T02:58:07.6988626Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:08 75.016 INF Added 1336 subtitle data entries and 3 speaker colors
+2026-03-23T11:58:08 75.205 INF Loaded (local): subtitles in 0.38
+2026-03-23T11:58:08 75.852 INF ShapeControllers: 96
+2026-03-23T11:58:10 77.133 INF Loaded (local): videos in 0.47
+2026-03-23T11:58:10 77.759 INF Loading players.xml
+2026-03-23T11:58:10 77.768 INF [mnetSevenDaysBridge] 2026-03-23T02:58:10.9064563Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:10 77.775 INF createWorld: Pregen08k01, VanillaDiagClientOnly, GameModeSurvival
+2026-03-23T11:58:10 77.776 INF Occlusion: Enabled
+2026-03-23T11:58:11 78.028 INF Started thread ChunkRegeneration
+2026-03-23T11:58:11 78.029 INF Started thread ChunkCalc
+2026-03-23T11:58:11 78.029 INF Started thread ChunkMeshBake
+2026-03-23T11:58:11 78.487 INF World.Load: Pregen08k01
+2026-03-23T11:58:11 78.503 INF BloodMoon SetDay: day 14, last day 7, freq 7, range 0
+2026-03-23T11:58:11 78.708 INF [XUi] Initialized all window groups completed in 1321 ms total.
+2026-03-23T11:58:11 78.714 INF Started thread WaterSimulationApplyChanges
+2026-03-23T11:58:14 81.000 INF [mnetSevenDaysBridge] 2026-03-23T02:58:14.1394944Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:17 84.227 INF [mnetSevenDaysBridge] 2026-03-23T02:58:17.3657430Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:20 87.364 INF [mnetSevenDaysBridge] 2026-03-23T02:58:20.5027848Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:21 87.934 ERR [Discord][RTC][Log] Core Audio method failed (hr=-2147023728) (audio_device_core_win.cc:4508)
+2026-03-23T11:58:21 87.935 ERR [Discord][RTC][Log] Error details: Element not found. (audio_device_core_win.cc:4512)
+2026-03-23T11:58:21 87.947 WRN [EOS] [LogAudioMixer - Warning] Changing default audio render device to new device: {3.0.0.00000001}.{6C26BA7D-F0B2-4225-B422-8168C5261E45}.
+2026-03-23T11:58:21 88.358 INF [Discord] Current output device: default // default (繝ｪ繝｢繝ｼ繝・繧ｪ繝ｼ繝・ぅ繧ｪ) // True
+2026-03-23T11:58:21 88.359 INF [Discord] Current input device: default // default () // True
+2026-03-23T11:58:23 90.746 INF [mnetSevenDaysBridge] 2026-03-23T02:58:23.8852778Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:27 94.208 INF [mnetSevenDaysBridge] 2026-03-23T02:58:27.3469324Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:30 97.336 INF [mnetSevenDaysBridge] 2026-03-23T02:58:30.4744086Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:33 100.398 INF [mnetSevenDaysBridge] 2026-03-23T02:58:33.5364906Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:36 103.714 INF [mnetSevenDaysBridge] 2026-03-23T02:58:36.8527129Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:40 107.022 INF [mnetSevenDaysBridge] 2026-03-23T02:58:40.1616104Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:43 110.132 INF [mnetSevenDaysBridge] 2026-03-23T02:58:43.2707804Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:45 112.123 ERR [Discord][RTC][Log] Core Audio method failed (hr=-2147023728) (audio_device_core_win.cc:4508)
+2026-03-23T11:58:45 112.123 ERR [Discord][RTC][Log] Error details: Element not found. (audio_device_core_win.cc:4512)
+2026-03-23T11:58:45 112.124 ERR [Discord][RTC][Log] Core Audio method failed (hr=-2147023728) (audio_device_core_win.cc:4508)
+2026-03-23T11:58:45 112.125 ERR [Discord][RTC][Log] Error details: Element not found. (audio_device_core_win.cc:4512)
+2026-03-23T11:58:45 112.436 INF [Discord] Current output device: default // default () // True
+2026-03-23T11:58:45 112.437 INF [Discord] Current input device: default // default () // True
+2026-03-23T11:58:46 113.191 INF [mnetSevenDaysBridge] 2026-03-23T02:58:46.3296875Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:48 115.829 INF Started thread GenerateChunks
+2026-03-23T11:58:49 116.448 INF [mnetSevenDaysBridge] 2026-03-23T02:58:49.5862188Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:52 119.638 INF [mnetSevenDaysBridge] 2026-03-23T02:58:52.7770661Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:53 120.722 INF Calculating world hashes took 4714 ms (world size 270 MiB)
+2026-03-23T11:58:53 120.725 INF Initial ENABLE_FILE_BACKED_ARRAYS == False
+2026-03-23T11:58:54 120.866 INF GenWorldFromRaw load dtm took 4858ms
+2026-03-23T11:58:54 121.078 INF Biomes image size w= 1024, h = 1024
+2026-03-23T11:58:55 122.385 INF Radiation ignored 8192
+2026-03-23T11:58:55 122.386 INF GenWorldFromRaw biomes took 1519ms
+2026-03-23T11:58:56 123.569 INF [mnetSevenDaysBridge] 2026-03-23T02:58:56.7075031Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:58:59 126.125 INF GenWorldFromRaw shader control textures took 1660ms
+2026-03-23T11:59:00 127.256 INF [mnetSevenDaysBridge] 2026-03-23T02:59:00.3951272Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:59:03 130.341 INF [mnetSevenDaysBridge] 2026-03-23T02:59:03.4792637Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:59:03 130.585 INF Computed 1595 chunk groups containing a total of 36332 chunks. Largest group contains 333 chunks.
+2026-03-23T11:59:03 130.604 INF Started thread SaveChunks C:\Users\tetsuomorisaki\AppData\Roaming\7DaysToDie\Saves\Pregen08k01\VanillaDiagClientOnly\Region
+2026-03-23T11:59:03 130.616 INF GenWorldFromRaw misc took 4490ms
+2026-03-23T11:59:05 132.294 INF GenWorldFromRaw splats took 1677ms
+2026-03-23T11:59:06 133.470 INF [mnetSevenDaysBridge] 2026-03-23T02:59:06.6087784Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:59:10 137.140 INF [mnetSevenDaysBridge] 2026-03-23T02:59:10.2791120Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:59:13 140.322 INF [mnetSevenDaysBridge] 2026-03-23T02:59:13.4601203Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:59:13 140.637 INF [DECO] read 126464
+2026-03-23T11:59:14 141.098 INF Dynamic Music Initialized on Server
+2026-03-23T11:59:14 141.115 INF Dynamic Music Initialized on Client
+2026-03-23T11:59:14 141.116 INF Begin DMS Conductor Preload Routine
+2026-03-23T11:59:14 141.118 INF Preloading LayeredSection Exploration : Type: DynamicMusic.Adventure
+2026-03-23T11:59:14 141.120 INF Loading new config for Exploration...
+2026-03-23T11:59:14 141.325 INF Loading new ClipSets for Exploration...
+2026-03-23T11:59:16 143.396 INF [mnetSevenDaysBridge] 2026-03-23T02:59:16.5343952Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:59:18 145.284 INF Exploration loaded new config and clipsets
+2026-03-23T11:59:18 145.344 INF Preloading LayeredSection Suspense : Type: DynamicMusic.Adventure
+2026-03-23T11:59:18 145.345 INF Loading new config for Suspense...
+2026-03-23T11:59:18 145.544 INF Loading new ClipSets for Suspense...
+2026-03-23T11:59:19 146.293 INF Suspense loaded new config and clipsets
+2026-03-23T11:59:19 146.322 INF Preloading LayeredSection Combat : Type: DynamicMusic.Combat
+2026-03-23T11:59:19 146.323 INF Loading new config for Combat...
+2026-03-23T11:59:19 146.457 INF [mnetSevenDaysBridge] 2026-03-23T02:59:19.5953734Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:59:19 146.530 INF Loading new ClipSets for Combat...
+2026-03-23T11:59:22 149.011 INF Combat loaded new config and clipsets
+2026-03-23T11:59:22 149.061 INF Preloading LayeredSection Bloodmoon : Type: DynamicMusic.Bloodmoon
+2026-03-23T11:59:22 149.062 INF Loading new config for Bloodmoon...
+2026-03-23T11:59:22 149.531 INF [mnetSevenDaysBridge] 2026-03-23T02:59:22.6698460Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:59:25 152.169 INF [EOS] Created RFS Request: drops.xml
+2026-03-23T11:59:25 152.604 INF [mnetSevenDaysBridge] 2026-03-23T02:59:25.7432837Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:59:25 152.662 INF AstarManager Init
+2026-03-23T11:59:26 153.485 INF [EOS] Read (drops.xml) completed: Success, received 781 bytes
+2026-03-23T11:59:26 153.493 INF fetching Twitch entitlements for s76561198033886737
+2026-03-23T11:59:27 154.484 WRN Failed to fetch Twitch entitlements: HTTP/1.1 404 Not Found
+2026-03-23T11:59:28 155.662 INF [mnetSevenDaysBridge] 2026-03-23T02:59:28.8010236Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:59:30 157.046 INF createWorld() done
+2026-03-23T11:59:31 158.150 INF Created player with id=171
+2026-03-23T11:59:31 158.165 INF [PartyQuests] Player registered: [type=EntityPlayerLocal, name=mrsk, id=171]
+2026-03-23T11:59:31 158.202 INF Respawning: LoadedGame
+2026-03-23T11:59:31 158.207 INF Loaded player
+2026-03-23T11:59:31 158.522 INF VehicleManager C:\Users\tetsuomorisaki\AppData\Roaming/7DaysToDie\Saves/Pregen08k01/VanillaDiagClientOnly/vehicles.dat, loaded 0
+2026-03-23T11:59:31 158.524 INF DroneManager C:\Users\tetsuomorisaki\AppData\Roaming/7DaysToDie\Saves/Pregen08k01/VanillaDiagClientOnly/drones.dat, loaded 0
+2026-03-23T11:59:31 158.525 INF TurretTracker C:\Users\tetsuomorisaki\AppData\Roaming/7DaysToDie\Saves/Pregen08k01/VanillaDiagClientOnly/turrets.dat, loaded 0
+2026-03-23T11:59:31 158.816 INF [mnetSevenDaysBridge] 2026-03-23T02:59:31.9547814Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:59:32 158.975 INF [EOS] Registering server
+2026-03-23T11:59:32 158.985 INF [LANMasterServerAnnouncer] listening on 11000 and multicast group 239.192.0.1
+2026-03-23T11:59:32 158.985 INF [PlayerInteractions] JoinedMultplayerServer
+2026-03-23T11:59:34 161.228 INF 60sec delta: 0,current: 1228462,desired: 1303726
+2026-03-23T11:59:34 161.230 INF [Backtrace] Updated Statistics
+2026-03-23T11:59:34 161.231 INF [Steamworks.NET] GameServer.Init successful
+2026-03-23T11:59:34 161.322 INF [DECO] written 126464, in 31ms
+2026-03-23T11:59:34 161.328 INF [DECO] write thread 5ms
+2026-03-23T11:59:34 161.615 INF OpenSpawnWindow
+2026-03-23T11:59:34 161.665 INF Loading dymesh settings
+2026-03-23T11:59:34 161.665 INF Dynamic Mesh Settings
+2026-03-23T11:59:34 161.666 INF Use Imposter Values: False
+2026-03-23T11:59:34 161.666 INF Only Player Areas: False
+2026-03-23T11:59:34 161.666 INF Player Area Buffer: 3
+2026-03-23T11:59:34 161.667 INF Max View Distance: 1500
+2026-03-23T11:59:34 161.667 INF Regen all on new world: False
+2026-03-23T11:59:34 161.670 INF Dymesh: Prepping dynamic mesh. Resend Default: True
+2026-03-23T11:59:34 161.671 INF Dymesh: Mesh location: C:\Users\tetsuomorisaki\AppData\Roaming/7DaysToDie\Saves/Pregen08k01/VanillaDiagClientOnly/DynamicMeshes/
+2026-03-23T11:59:34 161.672 INF StartGame done
+2026-03-23T11:59:34 161.673 INF [Steamworks.NET] GameServer.LogOn successful, SteamID=90283341032223745, public IP=9*.20*.21*.24*
+2026-03-23T11:59:34 161.689 INF [EOS] Server registered, session: 76c49190d37641368eb98a05971e5363, 56 attributes
+2026-03-23T11:59:34 161.694 INF [EOS] Session address: 9*.20*.21*.24*
+2026-03-23T11:59:34 161.704 INF [Steamworks.NET] Trying to create Lobby (visibility: k_ELobbyTypePrivate)
+2026-03-23T11:59:34 161.706 INF [Discord] Global lobby: 92.202.218.243_76A4C849DA7D1841B5AE505EF27A0795
+2026-03-23T11:59:34 161.707 INF [Discord] CreateOrJoinLobby: 92.202.218.243_76A4C849DA7D1841B5AE505EF27A0795, session=76c49190d37641368eb98a05971e5363, platform=EOS
+2026-03-23T11:59:35 161.935 INF [Steamworks.NET] Lobby creation succeeded, LobbyID=109775243724282773, server SteamID=90283341032223745, server public IP=9*.20*.21*.24*, server port=26910
+2026-03-23T11:59:35 161.941 INF [Steamworks.NET] Lobby entered: 109775243724282773
+2026-03-23T11:59:35 162.380 INF Dymesh: Warming dynamic mesh
+2026-03-23T11:59:35 162.381 INF Dymesh: Creating dynamic mesh manager
+2026-03-23T11:59:35 162.385 INF Dymesh: Awake
+2026-03-23T11:59:35 162.386 INF Dymesh: Mesh location: C:\Users\tetsuomorisaki\AppData\Roaming/7DaysToDie\Saves/Pregen08k01/VanillaDiagClientOnly/DynamicMeshes/
+2026-03-23T11:59:35 162.388 INF Dymesh: Loading Items: C:\Users\tetsuomorisaki\AppData\Roaming/7DaysToDie\Saves/Pregen08k01/VanillaDiagClientOnly/DynamicMeshes/
+2026-03-23T11:59:35 162.390 INF Dymesh: Loaded Items: 0
+2026-03-23T11:59:35 162.392 INF Dymesh: Loading all items took: 0.0047386 seconds.
+2026-03-23T11:59:35 162.405 INF Meshlist count is now 1
+2026-03-23T11:59:35 162.406 INF Meshlist count is now 2
+2026-03-23T11:59:35 162.407 INF Force load took 0 seconds
+2026-03-23T11:59:35 162.409 INF Clearing queues.
+2026-03-23T11:59:35 162.410 INF Cleared queues.
+2026-03-23T11:59:35 162.412 INF Dynamic thread starting
+2026-03-23T11:59:35 162.414 INF Dymesh door replacement: imposterBlock
+2026-03-23T11:59:51 177.941 INF [mnetSevenDaysBridge] 2026-03-23T02:59:51.0794757Z [INF] Incoming request: GET /api/get_state
+2026-03-23T11:59:51 178.777 INF [mnetSevenDaysBridge] 2026-03-23T02:59:51.9157789Z [INF] Incoming request: POST /api/command
+2026-03-23T11:59:56 183.321 INF [mnetSevenDaysBridge] 2026-03-23T02:59:56.4600461Z [INF] Incoming request: POST /api/command
+2026-03-23T11:59:56 183.326 INF [mnetSevenDaysBridge] 2026-03-23T02:59:56.4656701Z [INF] Incoming request: GET /api/get_state
+2026-03-23T12:00:05 192.824 INF Time: 2.83m FPS: 59.85 Heap: 2138.1MB Max: 2138.1MB Chunks: 298 CGO: 144 Ply: 1 Zom: 0 Ent: 1 (1) Items: 0 CO: 1 RSS: 4272.9MB
+2026-03-23T12:00:35 222.813 INF 60sec delta: 1607443,current: 1607443,desired: 1599123
+2026-03-23T12:00:35 222.813 INF [Backtrace] Updated Statistics
+2026-03-23T12:00:35 222.827 INF Time: 3.33m FPS: 59.82 Heap: 2149.0MB Max: 2149.0MB Chunks: 298 CGO: 144 Ply: 1 Zom: 0 Ent: 1 (1) Items: 0 CO: 1 RSS: 4270.6MB
+2026-03-23T12:01:05 252.831 INF Time: 3.83m FPS: 59.76 Heap: 2160.8MB Max: 2160.8MB Chunks: 298 CGO: 144 Ply: 1 Zom: 0 Ent: 1 (1) Items: 0 CO: 1 RSS: 4278.4MB

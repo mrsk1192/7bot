@@ -125,7 +125,7 @@ namespace mnetSevenDaysBridge
             player.OnValue_InputSmoothLook = Vector2.zero;
             player.SetMoveState(EntityPlayerLocal.MoveState.None, false);
             player.SetMoveStateToDefault();
-            player.ClearMovementInputs();
+            InvokeOptional(player, "ClearMovementInputs");
             player.EnableAutoMove(false);
             lastAutoRun = false;
             lastUiState = BuildUiState(player);
@@ -183,7 +183,7 @@ namespace mnetSevenDaysBridge
                 return;
             }
 
-            player.ClearMovementInputs();
+            InvokeOptional(player, "ClearMovementInputs");
         }
 
         public void OnBeforeMoveByInput(EntityPlayerLocal player)
@@ -238,7 +238,7 @@ namespace mnetSevenDaysBridge
                 && Math.Abs(frameState.LookDx) < 0.001f
                 && Math.Abs(frameState.LookDy) < 0.001f)
             {
-                player.ClearMovementInputs();
+                InvokeOptional(player, "ClearMovementInputs");
             }
         }
 

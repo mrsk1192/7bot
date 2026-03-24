@@ -12,19 +12,22 @@ namespace mnetSevenDaysBridge
         private readonly Func<UiState> uiStateProvider;
         private readonly Func<bool> inputBackendAvailableProvider;
         private readonly Func<DeathRespawnStateSnapshot> deathRespawnStateProvider;
+        private readonly ObservationService observationService;
 
         public GameStateCollector(
             BridgeLogger logger,
             Func<InputState> inputStateProvider,
             Func<UiState> uiStateProvider,
             Func<bool> inputBackendAvailableProvider,
-            Func<DeathRespawnStateSnapshot> deathRespawnStateProvider)
+            Func<DeathRespawnStateSnapshot> deathRespawnStateProvider,
+            ObservationService observationService)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.inputStateProvider = inputStateProvider ?? throw new ArgumentNullException(nameof(inputStateProvider));
             this.uiStateProvider = uiStateProvider ?? throw new ArgumentNullException(nameof(uiStateProvider));
             this.inputBackendAvailableProvider = inputBackendAvailableProvider ?? throw new ArgumentNullException(nameof(inputBackendAvailableProvider));
             this.deathRespawnStateProvider = deathRespawnStateProvider ?? throw new ArgumentNullException(nameof(deathRespawnStateProvider));
+            this.observationService = observationService ?? throw new ArgumentNullException(nameof(observationService));
         }
 
         public BridgeState CollectState()
@@ -102,7 +105,11 @@ namespace mnetSevenDaysBridge
                     InputBackendAvailable = inputBackendAvailableProvider(),
                     UiStateAvailable = uiState != null,
                     RespawnStateAvailable = true
-                }
+                },
+                ResourceObservation = observationService.GetResourceObservation(),
+                NearbyResourceCandidatesSummary = observationService.GetNearbyResourceCandidatesSummary(),
+                NearbyInteractablesSummary = observationService.GetNearbyInteractablesSummary(),
+                NearbyEntitiesSummary = observationService.GetNearbyEntitiesSummary()
             };
         }
 
@@ -278,7 +285,44 @@ namespace mnetSevenDaysBridge
             var biome = ReadMember(player, "biomeStandingOn")
                 ?? ReadMember(player, "BiomeStandingOn")
                 ?? ReadMember(player, "biome");
-            return biome == null ? null : biome.ToString();
+            var biomeName = NormalizeBiomeName(biome);
+            if ((biome == null || string.IsNullOrWhiteSpace(biomeName)) && player is EntityPlayerLocal localPlayer)
+            {
+                var gameManager = GameManager.Instance;
+                var world = gameManager == null ? null : gameManager.World;
+                if (world != null)
+                {
+                    biome = InvokeMember(world, "GetBiomeInWorld", Mathf.FloorToInt(localPlayer.position.x), Mathf.FloorToInt(localPlayer.position.z))
+                        ?? InvokeMember(world, "GetBiome", Mathf.FloorToInt(localPlayer.position.x), Mathf.FloorToInt(localPlayer.position.z));
+                    biomeName = NormalizeBiomeName(biome);
+                }
+            }
+
+            return string.IsNullOrWhiteSpace(biomeName) ? null : biomeName;
+        }
+
+        private string NormalizeBiomeName(object biome)
+        {
+            if (biome == null)
+            {
+                return null;
+            }
+
+            var biomeName = ReadMember(biome, "m_sBiomeName")
+                ?? ReadMember(biome, "LocalizedName")
+                ?? ReadMember(biome, "BiomeName")
+                ?? ReadMember(biome, "Name");
+            if (biomeName != null)
+            {
+                var text = biomeName.ToString();
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    return text;
+                }
+            }
+
+            var fallback = biome.ToString();
+            return string.IsNullOrWhiteSpace(fallback) ? null : fallback;
         }
 
         private bool? TryReadHoldingLight(object player)

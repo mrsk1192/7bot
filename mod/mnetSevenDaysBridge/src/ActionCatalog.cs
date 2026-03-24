@@ -108,18 +108,26 @@ namespace mnetSevenDaysBridge
 
             return new CapabilitySet
             {
-                Phase = "phase3",
+                Phase = "phase4",
                 ActiveBackend = activeBackend,
                 AvailableBackends = availableBackends,
                 Commands = new Dictionary<string, CapabilityInfo>
                 {
                     { "ping", new CapabilityInfo { Supported = true, Note = "Connectivity check." } },
                     { "get_version", new CapabilityInfo { Supported = true, Note = "Returns bridge version and backend routing mode." } },
-                    { "get_capabilities", new CapabilityInfo { Supported = true, Note = "Returns Phase 3 command, action, and respawn capabilities." } },
+                    { "get_capabilities", new CapabilityInfo { Supported = true, Note = "Returns Phase 4 command, action, respawn, and observation capabilities." } },
                     { "get_state", new CapabilityInfo { Supported = true, Note = "Returns current state including bridge-held input state." } },
                     { "get_player_position", new CapabilityInfo { Supported = true, Note = "Returns player position." } },
                     { "get_player_rotation", new CapabilityInfo { Supported = true, Note = "Returns player rotation." } },
-                    { "get_logs_tail", new CapabilityInfo { Supported = true, Note = "Returns the in-memory log tail." } }
+                    { "get_logs_tail", new CapabilityInfo { Supported = true, Note = "Returns the in-memory log tail." } },
+                    { "get_look_target", new CapabilityInfo { Supported = true, Note = "Returns the current focused look target with interaction hints." } },
+                    { "get_interaction_context", new CapabilityInfo { Supported = true, Note = "Returns interaction guidance for the current focus target." } },
+                    { "query_resource_candidates", new CapabilityInfo { Supported = true, Note = "Returns nearby resource, ore, and loot-container candidates." } },
+                    { "query_interactables_in_radius", new CapabilityInfo { Supported = true, Note = "Returns nearby interactable blocks and entities." } },
+                    { "query_entities_in_radius", new CapabilityInfo { Supported = true, Note = "Returns nearby entities for threat and interaction awareness." } },
+                    { "get_environment_summary", new CapabilityInfo { Supported = true, Note = "Returns current biome, foot block, indoor/outdoor, and hazard hints." } },
+                    { "get_biome_info", new CapabilityInfo { Supported = true, Note = "Returns biome information and hazard hints." } },
+                    { "get_terrain_summary", new CapabilityInfo { Supported = true, Note = "Returns nearby terrain height and hazard summaries." } }
                 },
                 Actions = actions,
                 Respawn = new Dictionary<string, CapabilityInfo>
@@ -142,6 +150,8 @@ namespace mnetSevenDaysBridge
                     { "map_open_close", new CapabilityInfo { Supported = false, Note = "Only toggle_map is guaranteed; strict open/close remains unavailable." } },
                     { "quest_log_open_close", new CapabilityInfo { Supported = false, Note = "Only toggle_quest_log is guaranteed; strict open/close remains unavailable." } },
                     { "debug_commands", new CapabilityInfo { Supported = false, Note = "Debug commands remain intentionally disabled." } }
+                    ,
+                    { "phase4_observation_queries", new CapabilityInfo { Supported = true, Note = "Phase 4 observation queries expose look target, nearby entities, interactables, resources, biome, and terrain summaries." } }
                 }
             };
         }

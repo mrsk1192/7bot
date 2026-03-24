@@ -1,0 +1,15 @@
+C:\AI\7agent2\tools\tmp_sig_dump\bin\Debug\net9.0\tmp_sig_dump.exe
+C:\AI\7agent2\tools\tmp_sig_dump\bin\Debug\net9.0\tmp_sig_dump.deps.json
+C:\AI\7agent2\tools\tmp_sig_dump\bin\Debug\net9.0\tmp_sig_dump.runtimeconfig.json
+C:\AI\7agent2\tools\tmp_sig_dump\bin\Debug\net9.0\tmp_sig_dump.dll
+C:\AI\7agent2\tools\tmp_sig_dump\bin\Debug\net9.0\tmp_sig_dump.pdb
+C:\AI\7agent2\tools\tmp_sig_dump\obj\Debug\net9.0\tmp_sig_dump.GeneratedMSBuildEditorConfig.editorconfig
+C:\AI\7agent2\tools\tmp_sig_dump\obj\Debug\net9.0\tmp_sig_dump.AssemblyInfoInputs.cache
+C:\AI\7agent2\tools\tmp_sig_dump\obj\Debug\net9.0\tmp_sig_dump.AssemblyInfo.cs
+C:\AI\7agent2\tools\tmp_sig_dump\obj\Debug\net9.0\tmp_sig_dump.csproj.CoreCompileInputs.cache
+C:\AI\7agent2\tools\tmp_sig_dump\obj\Debug\net9.0\tmp_sig_dump.sourcelink.json
+C:\AI\7agent2\tools\tmp_sig_dump\obj\Debug\net9.0\tmp_sig_dump.dll
+C:\AI\7agent2\tools\tmp_sig_dump\obj\Debug\net9.0\refint\tmp_sig_dump.dll
+C:\AI\7agent2\tools\tmp_sig_dump\obj\Debug\net9.0\tmp_sig_dump.pdb
+C:\AI\7agent2\tools\tmp_sig_dump\obj\Debug\net9.0\tmp_sig_dump.genruntimeconfig.cache
+C:\AI\7agent2\tools\tmp_sig_dump\obj\Debug\net9.0\ref\tmp_sig_dump.dll

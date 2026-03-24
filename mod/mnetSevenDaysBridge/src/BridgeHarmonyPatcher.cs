@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using HarmonyLib;
 
 namespace mnetSevenDaysBridge
@@ -11,10 +12,19 @@ namespace mnetSevenDaysBridge
         private static Harmony harmony;
         private static InternalInputBackend backend;
         private static RespawnController respawnController;
+        private static StartupAutomationController startupAutomationController;
         private static BridgeLogger logger;
         private static DateTime lastEnteringAreaSuppressionLogUtc = DateTime.MinValue;
+        private static bool loggedSpawnNearFriendsSuppression;
+        private static bool loggedRichPresenceSuppression;
+        private static bool loggedDiscordInGameUpdateSuppression;
 
-        public static void Apply(BridgeLogger bridgeLogger, InternalInputBackend internalInputBackend, RespawnController bridgeRespawnController)
+        public static void Apply(
+            BridgeLogger bridgeLogger,
+            InternalInputBackend internalInputBackend,
+            RespawnController bridgeRespawnController,
+            StartupAutomationController bridgeStartupAutomationController,
+            BridgeConfig config)
         {
             if (bridgeLogger == null)
             {
@@ -31,15 +41,30 @@ namespace mnetSevenDaysBridge
                 throw new ArgumentNullException(nameof(bridgeRespawnController));
             }
 
+            if (bridgeStartupAutomationController == null)
+            {
+                throw new ArgumentNullException(nameof(bridgeStartupAutomationController));
+            }
+
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+
             lock (SyncRoot)
             {
                 logger = bridgeLogger;
                 backend = internalInputBackend;
                 respawnController = bridgeRespawnController;
+                startupAutomationController = bridgeStartupAutomationController;
                 if (harmony != null)
                 {
                     return;
                 }
+
+                loggedSpawnNearFriendsSuppression = false;
+                loggedRichPresenceSuppression = false;
+                loggedDiscordInGameUpdateSuppression = false;
 
                 harmony = new Harmony(HarmonyId);
                 harmony.PatchAll(typeof(BridgeHarmonyPatcher).Assembly);
@@ -60,6 +85,7 @@ namespace mnetSevenDaysBridge
                 harmony = null;
                 backend = null;
                 respawnController = null;
+                startupAutomationController = null;
                 logger = null;
             }
         }
@@ -112,6 +138,60 @@ namespace mnetSevenDaysBridge
             }
         }
 
+        [HarmonyPatch]
+        private static class XUiMainMenuButtonsInitPatch
+        {
+            private static System.Reflection.MethodBase TargetMethod()
+                => AccessTools.Method("XUiC_MainMenuButtons:Init");
+
+            private static void Postfix(object __instance)
+            {
+                try
+                {
+                    startupAutomationController?.OnMainMenuButtonsInitialized(__instance);
+                }
+                catch (Exception exception)
+                {
+                    logger?.Error("Failed during MainMenuButtons Init Harmony postfix.", exception);
+                }
+            }
+        }
+
+        [HarmonyPatch]
+        private static class XUiMainMenuButtonsOnOpenPatch
+        {
+            private static System.Reflection.MethodBase TargetMethod()
+                => AccessTools.Method("XUiC_MainMenuButtons:OnOpen");
+
+            private static void Postfix(object __instance)
+            {
+                try
+                {
+                    startupAutomationController?.OnMainMenuButtonsInitialized(__instance);
+                }
+                catch (Exception exception)
+                {
+                    logger?.Error("Failed during MainMenuButtons OnOpen Harmony postfix.", exception);
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(XUiC_NewContinueGame), "OnOpen")]
+        private static class XUiNewContinueGameOnOpenPatch
+        {
+            private static void Postfix(XUiC_NewContinueGame __instance)
+            {
+                try
+                {
+                    startupAutomationController?.OnNewContinueGameOpened(__instance);
+                }
+                catch (Exception exception)
+                {
+                    logger?.Error("Failed during NewContinueGame OnOpen Harmony postfix.", exception);
+                }
+            }
+        }
+
         [HarmonyPatch(typeof(XUiC_EnteringArea), "Update")]
         private static class XUiEnteringAreaUpdatePatch
         {
@@ -142,6 +222,86 @@ namespace mnetSevenDaysBridge
 
                 return null;
             }
+        }
+
+        [HarmonyPatch]
+        private static class XUiSpawnNearFriendsListRebuildListPatch
+        {
+            private static MethodBase TargetMethod()
+            {
+                return AccessTools.Method("XUiC_SpawnNearFriendsList:RebuildList");
+            }
+
+            private static Exception Finalizer(Exception __exception)
+            {
+                if (!ShouldSuppressNullReference(__exception))
+                {
+                    return __exception;
+                }
+
+                if (!loggedSpawnNearFriendsSuppression)
+                {
+                    loggedSpawnNearFriendsSuppression = true;
+                    logger?.Warn("Suppressed XUiC_SpawnNearFriendsList null-reference while opening the respawn UI.");
+                }
+
+                return null;
+            }
+        }
+
+        [HarmonyPatch]
+        private static class SteamRichPresenceUpdatePatch
+        {
+            private static MethodBase TargetMethod()
+            {
+                return AccessTools.Method("Platform.Steam.RichPresence:UpdateRichPresence");
+            }
+
+            private static Exception Finalizer(Exception __exception)
+            {
+                if (!ShouldSuppressNullReference(__exception))
+                {
+                    return __exception;
+                }
+
+                if (!loggedRichPresenceSuppression)
+                {
+                    loggedRichPresenceSuppression = true;
+                    logger?.Warn("Suppressed Platform.Steam.RichPresence null-reference during GameManager update.");
+                }
+
+                return null;
+            }
+        }
+
+        [HarmonyPatch]
+        private static class DiscordPresenceManagerSetPartyPatch
+        {
+            private static MethodBase TargetMethod()
+            {
+                return AccessTools.Method("DiscordManager+PresenceManager:setParty");
+            }
+
+            private static Exception Finalizer(Exception __exception)
+            {
+                if (!ShouldSuppressNullReference(__exception))
+                {
+                    return __exception;
+                }
+
+                if (!loggedDiscordInGameUpdateSuppression)
+                {
+                    loggedDiscordInGameUpdateSuppression = true;
+                    logger?.Warn("Suppressed DiscordManager PresenceManager.setParty null-reference during GameUpdate.");
+                }
+
+                return null;
+            }
+        }
+
+        private static bool ShouldSuppressNullReference(Exception exception)
+        {
+            return exception is NullReferenceException;
         }
     }
 }

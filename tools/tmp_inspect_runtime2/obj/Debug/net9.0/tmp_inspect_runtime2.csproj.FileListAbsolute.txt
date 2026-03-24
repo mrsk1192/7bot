@@ -1,0 +1,15 @@
+C:\AI\7agent2\tools\tmp_inspect_runtime2\bin\Debug\net9.0\tmp_inspect_runtime2.exe
+C:\AI\7agent2\tools\tmp_inspect_runtime2\bin\Debug\net9.0\tmp_inspect_runtime2.deps.json
+C:\AI\7agent2\tools\tmp_inspect_runtime2\bin\Debug\net9.0\tmp_inspect_runtime2.runtimeconfig.json
+C:\AI\7agent2\tools\tmp_inspect_runtime2\bin\Debug\net9.0\tmp_inspect_runtime2.dll
+C:\AI\7agent2\tools\tmp_inspect_runtime2\bin\Debug\net9.0\tmp_inspect_runtime2.pdb
+C:\AI\7agent2\tools\tmp_inspect_runtime2\obj\Debug\net9.0\tmp_inspect_runtime2.GeneratedMSBuildEditorConfig.editorconfig
+C:\AI\7agent2\tools\tmp_inspect_runtime2\obj\Debug\net9.0\tmp_inspect_runtime2.AssemblyInfoInputs.cache
+C:\AI\7agent2\tools\tmp_inspect_runtime2\obj\Debug\net9.0\tmp_inspect_runtime2.AssemblyInfo.cs
+C:\AI\7agent2\tools\tmp_inspect_runtime2\obj\Debug\net9.0\tmp_inspect_runtime2.csproj.CoreCompileInputs.cache
+C:\AI\7agent2\tools\tmp_inspect_runtime2\obj\Debug\net9.0\tmp_inspect_runtime2.sourcelink.json
+C:\AI\7agent2\tools\tmp_inspect_runtime2\obj\Debug\net9.0\tmp_inspect_runtime2.dll
+C:\AI\7agent2\tools\tmp_inspect_runtime2\obj\Debug\net9.0\refint\tmp_inspect_runtime2.dll
+C:\AI\7agent2\tools\tmp_inspect_runtime2\obj\Debug\net9.0\tmp_inspect_runtime2.pdb
+C:\AI\7agent2\tools\tmp_inspect_runtime2\obj\Debug\net9.0\tmp_inspect_runtime2.genruntimeconfig.cache
+C:\AI\7agent2\tools\tmp_inspect_runtime2\obj\Debug\net9.0\ref\tmp_inspect_runtime2.dll

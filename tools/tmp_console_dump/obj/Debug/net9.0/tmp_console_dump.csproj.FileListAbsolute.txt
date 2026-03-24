@@ -1,0 +1,15 @@
+C:\AI\7agent2\tools\tmp_console_dump\bin\Debug\net9.0\tmp_console_dump.exe
+C:\AI\7agent2\tools\tmp_console_dump\bin\Debug\net9.0\tmp_console_dump.deps.json
+C:\AI\7agent2\tools\tmp_console_dump\bin\Debug\net9.0\tmp_console_dump.runtimeconfig.json
+C:\AI\7agent2\tools\tmp_console_dump\bin\Debug\net9.0\tmp_console_dump.dll
+C:\AI\7agent2\tools\tmp_console_dump\bin\Debug\net9.0\tmp_console_dump.pdb
+C:\AI\7agent2\tools\tmp_console_dump\obj\Debug\net9.0\tmp_console_dump.GeneratedMSBuildEditorConfig.editorconfig
+C:\AI\7agent2\tools\tmp_console_dump\obj\Debug\net9.0\tmp_console_dump.AssemblyInfoInputs.cache
+C:\AI\7agent2\tools\tmp_console_dump\obj\Debug\net9.0\tmp_console_dump.AssemblyInfo.cs
+C:\AI\7agent2\tools\tmp_console_dump\obj\Debug\net9.0\tmp_console_dump.csproj.CoreCompileInputs.cache
+C:\AI\7agent2\tools\tmp_console_dump\obj\Debug\net9.0\tmp_console_dump.sourcelink.json
+C:\AI\7agent2\tools\tmp_console_dump\obj\Debug\net9.0\tmp_console_dump.dll
+C:\AI\7agent2\tools\tmp_console_dump\obj\Debug\net9.0\refint\tmp_console_dump.dll
+C:\AI\7agent2\tools\tmp_console_dump\obj\Debug\net9.0\tmp_console_dump.pdb
+C:\AI\7agent2\tools\tmp_console_dump\obj\Debug\net9.0\tmp_console_dump.genruntimeconfig.cache
+C:\AI\7agent2\tools\tmp_console_dump\obj\Debug\net9.0\ref\tmp_console_dump.dll

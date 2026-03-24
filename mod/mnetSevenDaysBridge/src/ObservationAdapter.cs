@@ -61,28 +61,30 @@ namespace mnetSevenDaysBridge
 
             try
             {
-                var state = collector.CollectState() as Dictionary<string, object>;
-                if (state == null)
+                var bridgeState = collector.CollectState();
+                if (bridgeState == null)
                 {
                     return;
                 }
 
-                bool isDead = false;
-                if (state.TryGetValue("Player", out var playerObj)
-                    && playerObj is Dictionary<string, object> player
-                    && player.TryGetValue("IsDead", out var deadObj)
-                    && deadObj is bool dead)
+                bool isDead = bridgeState.Player?.IsDead ?? false;
+
+                // Build a compact state dict for WebSocket broadcast
+                var state = new Dictionary<string, object>
                 {
-                    isDead = dead;
-                }
+                    { "IsDead", isDead },
+                    { "Alive", bridgeState.Player?.Alive },
+                    { "RespawnAvailable", bridgeState.Player?.RespawnAvailable },
+                    { "RespawnInProgress", bridgeState.Player?.RespawnInProgress }
+                };
 
                 if (!previousIsDead && isDead)
                 {
-                    ws.BroadcastEvent("death", new Dictionary<string, object> { { "State", state } });
+                    ws.BroadcastEvent("death", state);
                 }
                 else if (previousIsDead && !isDead)
                 {
-                    ws.BroadcastEvent("respawn_complete", new Dictionary<string, object> { { "State", state } });
+                    ws.BroadcastEvent("respawn_complete", state);
                 }
                 else
                 {

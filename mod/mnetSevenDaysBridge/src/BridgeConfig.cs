@@ -35,6 +35,10 @@ namespace mnetSevenDaysBridge
 
         public string AutoQuickContinueGameName { get; set; } = "VanillaDiagClientOnly";
 
+        public int WebSocketPort { get; set; } = 18772;
+
+        public bool EnableWebSocketPush { get; set; } = true;
+
         public string BaseUrl
         {
             get { return $"http://{Host}:{Port}/"; }

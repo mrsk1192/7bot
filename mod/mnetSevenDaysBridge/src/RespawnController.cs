@@ -75,7 +75,7 @@ namespace mnetSevenDaysBridge
                 var ui = ResolveUi(player);
                 var refreshedState = CollectUiState(player, ui);
                 EnsureRespawnReady(controller, refreshedState);
-                controller.SpawnButtonPressed(pending.Method, 0);
+                InvokeSpawnButton(controller, pending.Method);
                 tracker.MarkRespawnRequested(
                     pending.Method,
                     BuildSpawnSummary(
@@ -136,7 +136,7 @@ namespace mnetSevenDaysBridge
 
                     return TriggerSpawn(ui, controller, SpawnMethod.NearBedroll, state, "Triggered respawn near the bedroll.");
                 case "respawn_at_random":
-                    return TriggerSpawn(ui, controller, SpawnMethod.NewRandomSpawn, state, "Triggered a random respawn.");
+                    return TriggerSpawn(ui, controller, ResolveRandomSpawnMethod(), state, "Triggered a random respawn.");
                 case "respawn_confirm":
                     return TriggerSpawn(ui, controller, ChooseConfirmedMethod(state), state, "Confirmed the current respawn selection.");
                 case "respawn_cancel":
@@ -224,7 +224,7 @@ namespace mnetSevenDaysBridge
                     return RespawnUiState.CreateUnavailable("LocalPlayerUI was unavailable.");
                 }
 
-                var fallbackCooldown = NormalizeCooldown(ComputeFallbackCooldown(player));
+                var fallbackCooldown = NormalizeCooldown(tracker.ComputeFallbackCooldown(player));
                 var fallbackBedroll = HasBedrollSpawn(player);
                 var fallbackAvailable = !fallbackCooldown.HasValue || fallbackCooldown.Value <= 0.05f;
                 return new RespawnUiState
@@ -236,9 +236,9 @@ namespace mnetSevenDaysBridge
                     RespawnAvailable = fallbackAvailable,
                     RespawnCooldownSeconds = fallbackCooldown,
                     BedrollSpawnAvailable = fallbackBedroll,
-                    SelectedSpawnMethod = fallbackBedroll ? SpawnMethod.OnBedRoll : SpawnMethod.NewRandomSpawn,
+                    SelectedSpawnMethod = fallbackBedroll ? SpawnMethod.OnBedRoll : ResolveRandomSpawnMethod(),
                     NearestSpawnOptionSummary = BuildSpawnSummary(
-                        fallbackBedroll ? SpawnMethod.OnBedRoll : SpawnMethod.NewRandomSpawn,
+                        fallbackBedroll ? SpawnMethod.OnBedRoll : ResolveRandomSpawnMethod(),
                         player == null ? null : player.GetSpawnPoint(),
                         fallbackBedroll,
                         player),
@@ -255,19 +255,16 @@ namespace mnetSevenDaysBridge
                 var controller = GetSpawnSelectionController(ui);
                 var inSpawnSelection = TryIsInSpawnSelection(ui);
                 var isOpenInUi = TryIsOpenInUi(ui);
-                var windowMode = controller == null ? (XUiC_SpawnSelectionWindow.ESpawnWindowMode?)null : controller.WindowMode;
                 var respawnScreenOpen = controller != null
                     && (controller.IsOpen
                         || isOpenInUi
                         || inSpawnSelection
-                        || windowMode == XUiC_SpawnSelectionWindow.ESpawnWindowMode.Progress
-                        || windowMode == XUiC_SpawnSelectionWindow.ESpawnWindowMode.SpawnSelection
                         || playerIsDead);
                 var cooldown = controller == null ? null : TryReadFloat(controller, "delayCountdownTime");
                 cooldown = NormalizeCooldown(cooldown);
                 if (!cooldown.HasValue && playerIsDead)
                 {
-                    cooldown = ComputeFallbackCooldown(player);
+                    cooldown = tracker.ComputeFallbackCooldown(player);
                 }
 
                 var bedrollAvailable = (controller != null && (TryReadBool(controller, "bHasBedroll") ?? false))
@@ -296,7 +293,7 @@ namespace mnetSevenDaysBridge
             catch (Exception exception)
             {
                 logger.Warn("Respawn UI probing failed, falling back to player-only state: " + exception.Message);
-                var fallbackCooldown = NormalizeCooldown(ComputeFallbackCooldown(player));
+                var fallbackCooldown = NormalizeCooldown(tracker.ComputeFallbackCooldown(player));
                 var fallbackBedroll = HasBedrollSpawn(player);
                 var fallbackAvailable = playerIsDead && (!fallbackCooldown.HasValue || fallbackCooldown.Value <= 0.05f);
                 return new RespawnUiState
@@ -308,9 +305,9 @@ namespace mnetSevenDaysBridge
                     RespawnAvailable = fallbackAvailable,
                     RespawnCooldownSeconds = fallbackCooldown,
                     BedrollSpawnAvailable = fallbackBedroll,
-                    SelectedSpawnMethod = fallbackBedroll ? SpawnMethod.OnBedRoll : SpawnMethod.NewRandomSpawn,
+                    SelectedSpawnMethod = fallbackBedroll ? SpawnMethod.OnBedRoll : ResolveRandomSpawnMethod(),
                     NearestSpawnOptionSummary = BuildSpawnSummary(
-                        fallbackBedroll ? SpawnMethod.OnBedRoll : SpawnMethod.NewRandomSpawn,
+                        fallbackBedroll ? SpawnMethod.OnBedRoll : ResolveRandomSpawnMethod(),
                         player == null ? null : player.GetSpawnPoint(),
                         fallbackBedroll,
                         player),
@@ -332,7 +329,7 @@ namespace mnetSevenDaysBridge
             }
 
             EnsureRespawnReady(controller, state);
-            controller.SpawnButtonPressed(method, 0);
+            InvokeSpawnButton(controller, method);
             tracker.MarkRespawnRequested(method, BuildSpawnSummary(method, ReadMember(controller, "spawnTarget"), state.BedrollSpawnAvailable, ResolvePlayer()));
             logger.Info("Respawn command executed with method=" + method);
 
@@ -363,7 +360,7 @@ namespace mnetSevenDaysBridge
                     throw new BridgeCommandException(409, "RESPAWN_NOT_AVAILABLE", "Respawn was not yet available.");
                 }
 
-                openedController.SpawnButtonPressed(method, 0);
+                InvokeSpawnButton(openedController, method);
                 tracker.MarkRespawnRequested(
                     method,
                     BuildSpawnSummary(
@@ -418,7 +415,7 @@ namespace mnetSevenDaysBridge
                 if (!state.BedrollSpawnAvailable && !HasBedrollSpawn(player))
                 {
                     logger.Warn("Bedroll spawn requested but no bedroll was found. Falling back to random.");
-                    method = SpawnMethod.NewRandomSpawn;
+                    method = ResolveRandomSpawnMethod();
                 }
             }
 
@@ -509,7 +506,7 @@ namespace mnetSevenDaysBridge
             // Only attempt Open() if the controller was not found embedded.
             try
             {
-                XUiC_SpawnSelectionWindow.Open(ui, true, false, false);
+                TryOpenSpawnSelectionStatic(ui);
                 var controller = GetSpawnSelectionController(ui);
                 if (controller != null)
                 {
@@ -524,6 +521,61 @@ namespace mnetSevenDaysBridge
             }
         }
 
+        private static SpawnMethod ResolveRandomSpawnMethod()
+        {
+            // 7DTD V1.3 removed SpawnMethod.NewRandomSpawn. Try to find the correct value by reflection.
+            foreach (var name in new[] { "NewRandomSpawn", "Random", "Relocation", "NewBed" })
+            {
+                try
+                {
+                    var val = (SpawnMethod)Enum.Parse(typeof(SpawnMethod), name, ignoreCase: true);
+                    return val;
+                }
+                catch { }
+            }
+            return (SpawnMethod)1; // numeric fallback
+        }
+
+        private static void TryOpenSpawnSelectionStatic(LocalPlayerUI ui)
+        {
+            // V1.3 may have changed the Open() signature. Try reflection with multiple overloads.
+            try
+            {
+                var type = typeof(XUiC_SpawnSelectionWindow);
+                foreach (var m in type.GetMethods(BindingFlags.Public | BindingFlags.Static))
+                {
+                    if (!string.Equals(m.Name, "Open", StringComparison.Ordinal)) continue;
+                    var p = m.GetParameters();
+                    if (p.Length == 0) { m.Invoke(null, null); return; }
+                    if (p.Length == 1) { m.Invoke(null, new object[] { ui }); return; }
+                    if (p.Length == 2) { m.Invoke(null, new object[] { ui, true }); return; }
+                    if (p.Length == 3) { m.Invoke(null, new object[] { ui, true, false }); return; }
+                    if (p.Length == 4) { m.Invoke(null, new object[] { ui, true, false, false }); return; }
+                }
+            }
+            catch { }
+        }
+
+        private static void InvokeSpawnButton(XUiC_SpawnSelectionWindow controller, SpawnMethod method)
+        {
+            // V1.3 changed SpawnButtonPressed's second parameter from int to SpawnPosition.
+            var type = controller.GetType();
+            foreach (var m in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            {
+                if (!string.Equals(m.Name, "SpawnButtonPressed", StringComparison.Ordinal)) continue;
+                var p = m.GetParameters();
+                if (p.Length < 1) continue;
+                var args = new object[p.Length];
+                args[0] = method;
+                for (int i = 1; i < p.Length; i++)
+                {
+                    args[i] = p[i].ParameterType.IsValueType ? Activator.CreateInstance(p[i].ParameterType) : null;
+                }
+                m.Invoke(controller, args);
+                return;
+            }
+        }
+
         private static SpawnMethod ChooseDefaultMethod(RespawnUiState state)
         {
             if (state.BedrollSpawnAvailable)
@@ -531,7 +583,7 @@ namespace mnetSevenDaysBridge
                 return SpawnMethod.OnBedRoll;
             }
 
-            return SpawnMethod.NewRandomSpawn;
+            return ResolveRandomSpawnMethod();
         }
 
         private static SpawnMethod ChooseConfirmedMethod(RespawnUiState state)
@@ -763,7 +815,10 @@ namespace mnetSevenDaysBridge
 
             try
             {
-                return XUiC_SpawnSelectionWindow.IsInSpawnSelection(ui);
+                var m = typeof(XUiC_SpawnSelectionWindow).GetMethod("IsInSpawnSelection", BindingFlags.Public | BindingFlags.Static);
+                if (m == null) return false;
+                var result = m.Invoke(null, new object[] { ui });
+                return result is bool b && b;
             }
             catch
             {

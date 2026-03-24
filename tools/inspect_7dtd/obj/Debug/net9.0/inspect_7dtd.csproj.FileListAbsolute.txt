@@ -1,0 +1,15 @@
+C:\AI\7agent2\tools\inspect_7dtd\obj\Debug\net9.0\inspect_7dtd.GeneratedMSBuildEditorConfig.editorconfig
+C:\AI\7agent2\tools\inspect_7dtd\obj\Debug\net9.0\inspect_7dtd.AssemblyInfoInputs.cache
+C:\AI\7agent2\tools\inspect_7dtd\obj\Debug\net9.0\inspect_7dtd.AssemblyInfo.cs
+C:\AI\7agent2\tools\inspect_7dtd\obj\Debug\net9.0\inspect_7dtd.csproj.CoreCompileInputs.cache
+C:\AI\7agent2\tools\inspect_7dtd\obj\Debug\net9.0\inspect_7dtd.sourcelink.json
+C:\AI\7agent2\tools\inspect_7dtd\bin\Debug\net9.0\inspect_7dtd.exe
+C:\AI\7agent2\tools\inspect_7dtd\bin\Debug\net9.0\inspect_7dtd.deps.json
+C:\AI\7agent2\tools\inspect_7dtd\bin\Debug\net9.0\inspect_7dtd.runtimeconfig.json
+C:\AI\7agent2\tools\inspect_7dtd\bin\Debug\net9.0\inspect_7dtd.dll
+C:\AI\7agent2\tools\inspect_7dtd\bin\Debug\net9.0\inspect_7dtd.pdb
+C:\AI\7agent2\tools\inspect_7dtd\obj\Debug\net9.0\inspect_7dtd.dll
+C:\AI\7agent2\tools\inspect_7dtd\obj\Debug\net9.0\refint\inspect_7dtd.dll
+C:\AI\7agent2\tools\inspect_7dtd\obj\Debug\net9.0\inspect_7dtd.pdb
+C:\AI\7agent2\tools\inspect_7dtd\obj\Debug\net9.0\inspect_7dtd.genruntimeconfig.cache
+C:\AI\7agent2\tools\inspect_7dtd\obj\Debug\net9.0\ref\inspect_7dtd.dll
