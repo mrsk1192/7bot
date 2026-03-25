@@ -63,3 +63,61 @@
 2026-03-24 06:44:39,162 [INFO] Response {"Ok":true,"Command":"get_look_target","TimestampUtc":"2026-03-23T21:44:39.1619267Z","Data":{"HasTarget":true,"Source":"interaction_context","TargetKind":"loot","TargetName":"cntBirdnest","TargetClass":"Unknown","TargetId":"block:-262,45,905","EntityId":null,"BlockId":null,"Distance":3.779759,"Position":{"X":-261.5,"Y":45.5,"Z":905.5},"CanInteract":true,"InteractionPromptText":"Search","InteractionActionKind":"search","Hostile":false,"Alive":false,"Locked":"unknown","Powered":"unknown","Active":"unknown","LineOfSightClear":true,"IsResourceCandidate":false,"CandidateCategory":"loot_container","CandidateConfidence":0.78,"LikelyResourceType":"loot","Durability":"unknown","MaxDurability":"unknown","Note":"Resolved from the nearby interactable focus cone fallback."},"Error":null}
 2026-03-24 06:44:39,162 [INFO] Request GET http://127.0.0.1:18771/api/get_interaction_context with timeout 15.0
 2026-03-24 06:44:39,240 [INFO] Response {"Ok":true,"Command":"get_interaction_context","TimestampUtc":"2026-03-23T21:44:39.2393513Z","Data":{"HasFocusTarget":true,"CanInteractNow":true,"SuggestedActionKind":"search","PromptText":"Search","TargetKind":"loot","TargetName":"cntBirdnest","Distance":3.779759,"Source":"interaction_context","RequiresPreciseAlignment":true,"RecommendedInteractDistanceMin":0.7,"RecommendedInteractDistanceMax":4,"Note":"Interaction context was derived from the current look target."},"Error":null}
+2026-03-25 17:58:27,545 [INFO] Client initialized. base_url=http://127.0.0.1:18771 timeout=5.0
+2026-03-25 17:58:27,546 [INFO] Request GET http://127.0.0.1:18771/api/ping with timeout 5.0
+2026-03-25 17:58:29,637 [ERROR] Connection error from bridge
+Traceback (most recent call last):
+  File "C:\Users\tetsuomorisaki\AppData\Local\Python\pythoncore-3.14-64\Lib\urllib\request.py", line 1321, in do_open
+    h.request(req.get_method(), req.selector, req.data, headers,
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+              encode_chunked=req.has_header('Transfer-encoding'))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tetsuomorisaki\AppData\Local\Python\pythoncore-3.14-64\Lib\http\client.py", line 1358, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tetsuomorisaki\AppData\Local\Python\pythoncore-3.14-64\Lib\http\client.py", line 1404, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tetsuomorisaki\AppData\Local\Python\pythoncore-3.14-64\Lib\http\client.py", line 1353, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tetsuomorisaki\AppData\Local\Python\pythoncore-3.14-64\Lib\http\client.py", line 1113, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "C:\Users\tetsuomorisaki\AppData\Local\Python\pythoncore-3.14-64\Lib\http\client.py", line 1057, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "C:\Users\tetsuomorisaki\AppData\Local\Python\pythoncore-3.14-64\Lib\http\client.py", line 1023, in connect
+    self.sock = self._create_connection(
+                ~~~~~~~~~~~~~~~~~~~~~~~^
+        (self.host,self.port), self.timeout, self.source_address)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tetsuomorisaki\AppData\Local\Python\pythoncore-3.14-64\Lib\socket.py", line 870, in create_connection
+    raise exceptions[0]
+  File "C:\Users\tetsuomorisaki\AppData\Local\Python\pythoncore-3.14-64\Lib\socket.py", line 855, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+ConnectionRefusedError: [WinError 10061] 対象のコンピューターによって拒否されたため、接続できませんでした。
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\AI\7agent2\python_client\src\sevendays_bridge\client.py", line 311, in _request
+    with urlopen(request, timeout=effective_timeout) as response:
+         ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tetsuomorisaki\AppData\Local\Python\pythoncore-3.14-64\Lib\urllib\request.py", line 187, in urlopen
+    return opener.open(url, data, timeout)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tetsuomorisaki\AppData\Local\Python\pythoncore-3.14-64\Lib\urllib\request.py", line 487, in open
+    response = self._open(req, data)
+  File "C:\Users\tetsuomorisaki\AppData\Local\Python\pythoncore-3.14-64\Lib\urllib\request.py", line 504, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+                              '_open', req)
+  File "C:\Users\tetsuomorisaki\AppData\Local\Python\pythoncore-3.14-64\Lib\urllib\request.py", line 464, in _call_chain
+    result = func(*args)
+  File "C:\Users\tetsuomorisaki\AppData\Local\Python\pythoncore-3.14-64\Lib\urllib\request.py", line 1350, in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tetsuomorisaki\AppData\Local\Python\pythoncore-3.14-64\Lib\urllib\request.py", line 1324, in do_open
+    raise URLError(err)
+urllib.error.URLError: <urlopen error [WinError 10061] 対象のコンピューターによって拒否されたため、接続できませんでした。>

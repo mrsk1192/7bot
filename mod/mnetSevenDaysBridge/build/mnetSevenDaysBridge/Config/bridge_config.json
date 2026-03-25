@@ -13,5 +13,7 @@
   "bring_game_window_to_front_for_os_input": true,
   "auto_quick_continue_on_startup": true,
   "auto_quick_continue_game_world": "Pregen08k01",
-  "auto_quick_continue_game_name": "VanillaDiagClientOnly"
+  "auto_quick_continue_game_name": "VanillaDiagClientOnly",
+  "websocket_port": 18772,
+  "enable_websocket_push": true
 }

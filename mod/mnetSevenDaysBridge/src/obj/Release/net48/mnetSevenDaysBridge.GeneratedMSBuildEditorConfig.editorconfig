@@ -1,6 +1,6 @@
 is_global = true
 build_property.RootNamespace = mnetSevenDaysBridge
-build_property.ProjectDir = c:\AI\7agent2\mod\mnetSevenDaysBridge\src\
+build_property.ProjectDir = C:\AI\7agent2\mod\mnetSevenDaysBridge\src\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.CsWinRTUseWindowsUIXamlProjections = false

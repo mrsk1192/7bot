@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\AI\\7agent2\\mod\\mnetSevenDaysBridge\\src\\mnetSevenDaysBridge.csproj": {}
+    "C:\\AI\\7agent2\\mod\\mnetSevenDaysBridge\\src\\mnetSevenDaysBridge.csproj": {}
   },
   "projects": {
-    "c:\\AI\\7agent2\\mod\\mnetSevenDaysBridge\\src\\mnetSevenDaysBridge.csproj": {
+    "C:\\AI\\7agent2\\mod\\mnetSevenDaysBridge\\src\\mnetSevenDaysBridge.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\AI\\7agent2\\mod\\mnetSevenDaysBridge\\src\\mnetSevenDaysBridge.csproj",
+        "projectUniqueName": "C:\\AI\\7agent2\\mod\\mnetSevenDaysBridge\\src\\mnetSevenDaysBridge.csproj",
         "projectName": "mnetSevenDaysBridge",
-        "projectPath": "c:\\AI\\7agent2\\mod\\mnetSevenDaysBridge\\src\\mnetSevenDaysBridge.csproj",
+        "projectPath": "C:\\AI\\7agent2\\mod\\mnetSevenDaysBridge\\src\\mnetSevenDaysBridge.csproj",
         "packagesPath": "C:\\Users\\tetsuomorisaki\\.nuget\\packages\\",
-        "outputPath": "c:\\AI\\7agent2\\mod\\mnetSevenDaysBridge\\src\\obj\\",
+        "outputPath": "C:\\AI\\7agent2\\mod\\mnetSevenDaysBridge\\src\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
