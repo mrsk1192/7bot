@@ -30,6 +30,7 @@ class AgentGuiRuntimeAdapter:
             refresh_status=self.build_status_view_model,
             start_agent=self.controller.start_agent,
             stop_agent=self.controller.stop_agent,
+            reset_agent=self.controller.reset_agent,
             submit_command_form=self.submit_command_form,
             delete_selected_command=self.delete_selected_command,
             move_selected_up=self.move_selected_up,
@@ -59,6 +60,13 @@ class AgentGuiRuntimeAdapter:
             equipment_state=raw["equipment_state"],
             agent_state=raw["agent_state"],
             connection_state=raw["connection_state"],
+            player_position=raw["player_position"],
+            biome=raw["biome"],
+            look_target=raw["look_target"],
+            nearby_resource_count=raw["nearby_resource_count"],
+            nearby_interactable_count=raw["nearby_interactable_count"],
+            nearby_entity_count=raw["nearby_entity_count"],
+            last_error=raw["last_error"],
             command_queue=[
                 AgentCommandView(
                     command_id=command["command_id"],

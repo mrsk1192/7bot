@@ -152,6 +152,16 @@ class AgentController:
             self.logs.append("agent_stopped")
             self._notify_state_changed()
 
+    def reset_agent(self) -> None:
+        with self._lock:
+            self._agent_running = False
+            self._safe_stop_all_locked()
+            self.command_queue.replace_all([])
+            self.build_progress.clear()
+            self.last_interrupt_reason = ""
+            self.logs.append("agent_reset")
+            self._notify_state_changed()
+
     def is_agent_running(self) -> bool:
         with self._lock:
             return self._agent_running
@@ -222,6 +232,32 @@ class AgentController:
             weight_text = "unknown"
             if snapshot is not None:
                 weight_text = f"{snapshot.inventory_status.carried_weight_ratio:.2f}"
+            position_text = "unknown"
+            biome_text = "unknown"
+            look_target_text = "Unknown"
+            nearby_resource_count = "0"
+            nearby_interactable_count = "0"
+            nearby_entity_count = "0"
+            if player is not None and getattr(player, "position", None) is not None:
+                position = player.position
+                position_text = f"({position.x:.1f}, {position.y:.1f}, {position.z:.1f})"
+            if state is not None:
+                resource_observation = getattr(state, "resource_observation", None)
+                if resource_observation is not None:
+                    biome_text = getattr(resource_observation, "biome", biome_text) or biome_text
+                    look_target = getattr(resource_observation, "look_target", None)
+                    if look_target is not None:
+                        look_target_text = f"{getattr(look_target, 'target_kind', 'none')}:{getattr(look_target, 'target_name', 'Unknown')}"
+                resource_summary = getattr(state, "nearby_resource_candidates_summary", None)
+                if resource_summary is not None:
+                    nearby_resource_count = str(getattr(resource_summary, "count", 0))
+                interactable_summary = getattr(state, "nearby_interactables_summary", None)
+                if interactable_summary is not None:
+                    nearby_interactable_count = str(getattr(interactable_summary, "count", 0))
+                entity_summary = getattr(state, "nearby_entities_summary", None)
+                if entity_summary is not None:
+                    top_entities = getattr(entity_summary, "top_entities", []) or []
+                    nearby_entity_count = str(len(top_entities))
             return {
                 "current_action": "idle" if current is None else current.action_type.value,
                 "current_target": self._command_summary(current) if current is not None else "none",
@@ -235,6 +271,13 @@ class AgentController:
                 "equipment_state": equipment_text,
                 "agent_state": "running" if self._agent_running else "stopped",
                 "connection_state": self._connection_state,
+                "player_position": position_text,
+                "biome": biome_text,
+                "look_target": look_target_text,
+                "nearby_resource_count": nearby_resource_count,
+                "nearby_interactable_count": nearby_interactable_count,
+                "nearby_entity_count": nearby_entity_count,
+                "last_error": self._last_connection_error or "none",
                 "commands": command_list,
                 "bases": base_list,
                 "logs": self.logs[-50:],
@@ -280,6 +323,7 @@ class AgentController:
     def refresh_observation_cache(self) -> None:
         with self._lock:
             self._refresh_observation_cache_locked()
+            self._notify_state_changed()
 
     def has_pending_commands(self) -> bool:
         with self._lock:

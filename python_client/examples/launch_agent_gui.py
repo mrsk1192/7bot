@@ -77,7 +77,7 @@ def main() -> int:
         except Exception as exc:  # pragma: no cover - live GUI fallback
             controller.logs.append(f"panel_refresh_error:{type(exc).__name__}:{exc}")
         if not stop_event.is_set():
-            root.after(1500, refresh_gui)
+            root.after(5000, refresh_gui)
 
     def shutdown() -> None:
         stop_event.set()

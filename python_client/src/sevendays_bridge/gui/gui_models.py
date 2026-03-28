@@ -36,6 +36,13 @@ class AgentStatusViewModel:
     equipment_state: str
     agent_state: str = ""
     connection_state: str = ""
+    player_position: str = ""
+    biome: str = ""
+    look_target: str = ""
+    nearby_resource_count: str = ""
+    nearby_interactable_count: str = ""
+    nearby_entity_count: str = ""
+    last_error: str = ""
     command_queue: List[AgentCommandView] = field(default_factory=list)
     bases: List[BaseViewModel] = field(default_factory=list)
     logs: List[str] = field(default_factory=list)

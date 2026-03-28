@@ -1,4 +1,4 @@
-# GUI Settings
+﻿# GUI Settings
 
 ## Scan Settings Panel
 The GUI exposes a dedicated scan settings panel so exploration behavior can be tuned without editing source code.
@@ -33,10 +33,18 @@ Default runtime order:
 - for each yaw, pitch = `0, -15, -30, -45`
 
 ## Save and Restore
-- Press `設定保存` to validate and apply the values.
+- Press `設定を保存` to validate and apply the values.
 - Valid settings are written to the session file and restored on the next GUI launch.
 - Invalid settings stay only in the form and are not saved.
 
 ## Error Handling
 - If the values are invalid, the GUI shows the reason directly under the settings form.
 - The last valid runtime configuration remains active until a valid save succeeds.
+
+## Agent Runtime Controls
+The panel also exposes explicit runtime controls:
+- `エージェント開始`
+- `エージェント停止`
+- `エージェントリセット`
+
+These buttons control the agent loop without bypassing the GUI. Tests can use the same controls through widget automation.
