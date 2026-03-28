@@ -17,9 +17,14 @@ namespace mnetSevenDaysBridge
         };
 
         private readonly object syncRoot = new object();
+        private static readonly object actionTickSyncRoot = new object();
+        private static ulong lastInjectedActionTick;
         private readonly BridgeLogger logger;
         private InputFrameState latestFrameState = new InputFrameState();
         private bool? lastAutoRun;
+        private bool? lastPrimaryAction;
+        private bool? lastSecondaryAction;
+        private bool? lastHoldInteract;
         private UiState lastUiState = CreateUnavailableUiState("UI state has not been sampled yet.");
 
         public InternalInputBackend(BridgeLogger logger)
@@ -121,14 +126,57 @@ namespace mnetSevenDaysBridge
                 player.movementInput.sneak = false;
             }
 
-            player.OnValue_InputMoveVector = Vector2.zero;
-            player.OnValue_InputSmoothLook = Vector2.zero;
-            player.SetMoveState(EntityPlayerLocal.MoveState.None, false);
-            player.SetMoveStateToDefault();
-            InvokeOptional(player, "ClearMovementInputs");
-            player.EnableAutoMove(false);
+            try
+            {
+                player.OnValue_InputMoveVector = Vector2.zero;
+                player.OnValue_InputSmoothLook = Vector2.zero;
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                player.SetMoveState(EntityPlayerLocal.MoveState.None, false);
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                player.SetMoveStateToDefault();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                InvokeOptional(player, "ClearMovementInputs");
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                player.EnableAutoMove(false);
+            }
+            catch
+            {
+            }
+
             lastAutoRun = false;
-            lastUiState = BuildUiState(player);
+            ReleasePlayerActions(player);
+            try
+            {
+                lastUiState = BuildUiState(player);
+            }
+            catch
+            {
+                lastUiState = CreateUnavailableUiState("UI state was unavailable during neutral-state teardown.");
+            }
         }
 
         public UiState GetUiState()
@@ -226,6 +274,8 @@ namespace mnetSevenDaysBridge
                 fpCamera.SetRotation(new Vector2(nextPitch, nextYaw), true);
                 player.OnValue_InputSmoothLook = new Vector2(frameState.LookDx, frameState.LookDy);
             }
+
+            ApplyPlayerActions(player, frameState);
 
             if (!frameState.MoveForward
                 && !frameState.MoveBack
@@ -660,6 +710,50 @@ namespace mnetSevenDaysBridge
             PulseAction(playerInput.ToggleFlashlight);
         }
 
+        private void ApplyPlayerActions(EntityPlayerLocal player, InputFrameState frameState)
+        {
+            var playerInput = ReadMember(player, "playerInput") as PlayerActionsLocal;
+            if (playerInput == null)
+            {
+                return;
+            }
+
+            SetActionState(playerInput.Primary, frameState.PrimaryAction, ref lastPrimaryAction);
+            SetActionState(playerInput.Secondary, frameState.SecondaryAction, ref lastSecondaryAction);
+            SetActionState(playerInput.Activate, frameState.HoldInteract, ref lastHoldInteract);
+
+            if (frameState.ReloadPulse)
+            {
+                PulseAction(playerInput.Reload);
+            }
+
+            if (frameState.UseInteractPulse)
+            {
+                PulseAction(playerInput.Activate);
+            }
+
+            if (frameState.PrimaryTapPulse)
+            {
+                PulseAction(playerInput.Primary);
+            }
+        }
+
+        private void ReleasePlayerActions(EntityPlayerLocal player)
+        {
+            var playerInput = ReadMember(player, "playerInput") as PlayerActionsLocal;
+            if (playerInput == null)
+            {
+                lastPrimaryAction = false;
+                lastSecondaryAction = false;
+                lastHoldInteract = false;
+                return;
+            }
+
+            SetActionState(playerInput.Primary, false, ref lastPrimaryAction);
+            SetActionState(playerInput.Secondary, false, ref lastSecondaryAction);
+            SetActionState(playerInput.Activate, false, ref lastHoldInteract);
+        }
+
         private void ConfirmCurrentSelection(EntityPlayerLocal player)
         {
             var xui = GetXui(player);
@@ -723,9 +817,43 @@ namespace mnetSevenDaysBridge
             }
 
             var deltaTime = Time.unscaledDeltaTime > 0f ? Time.unscaledDeltaTime : 0.016f;
-            var tick = action.UpdateTick + 1UL;
+            var tick = ReserveNextActionTick(action);
             action.CommitWithState(true, tick, deltaTime);
-            action.CommitWithState(false, tick + 1UL, deltaTime);
+            action.CommitWithState(false, ReserveNextActionTick(action, tick), deltaTime);
+        }
+
+        private static void SetActionState(InControl.PlayerAction action, bool pressed, ref bool? lastState)
+        {
+            if (action == null)
+            {
+                lastState = pressed;
+                return;
+            }
+
+            if (lastState.HasValue && lastState.Value == pressed)
+            {
+                return;
+            }
+
+            var deltaTime = Time.unscaledDeltaTime > 0f ? Time.unscaledDeltaTime : 0.016f;
+            var tick = ReserveNextActionTick(action);
+            action.CommitWithState(pressed, tick, deltaTime);
+            lastState = pressed;
+        }
+
+        private static ulong ReserveNextActionTick(InControl.PlayerAction action, ulong minimumExclusive = 0UL)
+        {
+            lock (actionTickSyncRoot)
+            {
+                var currentTick = InControl.InputManager.CurrentTick;
+                var actionTick = action.UpdateTick;
+                var baseline = Math.Max(currentTick, actionTick);
+                baseline = Math.Max(baseline, lastInjectedActionTick);
+                baseline = Math.Max(baseline, minimumExclusive);
+                var nextTick = baseline + 1UL;
+                lastInjectedActionTick = nextTick;
+                return nextTick;
+            }
         }
 
         private static bool HasWindow(object windowManager, string name)

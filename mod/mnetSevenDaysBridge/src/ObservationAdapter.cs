@@ -13,6 +13,8 @@ namespace mnetSevenDaysBridge
 
         // Main thread only — no lock needed.
         private bool previousIsDead;
+        private int broadcastFrameCounter;
+        private const int BroadcastEveryNFrames = 10;
 
         public ObservationAdapter(
             BridgeLogger logger,
@@ -48,7 +50,12 @@ namespace mnetSevenDaysBridge
                 }
             }
 
-            TryBroadcastStateEvents();
+            broadcastFrameCounter++;
+            if (broadcastFrameCounter >= BroadcastEveryNFrames)
+            {
+                broadcastFrameCounter = 0;
+                TryBroadcastStateEvents();
+            }
         }
 
         private void TryBroadcastStateEvents()
@@ -61,7 +68,7 @@ namespace mnetSevenDaysBridge
 
             try
             {
-                var bridgeState = collector.CollectState();
+                var bridgeState = collector.CollectState(includeObservation: false);
                 if (bridgeState == null)
                 {
                     return;

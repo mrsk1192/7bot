@@ -93,7 +93,7 @@ namespace mnetSevenDaysBridge
                     snapshot.DeathScreenOpen = true;
                     snapshot.RespawnScreenOpen = true;
                     snapshot.RespawnAvailable = !snapshot.RespawnCooldownSeconds.HasValue
-                        || snapshot.RespawnCooldownSeconds.Value <= 0.05f;
+                        || snapshot.RespawnCooldownSeconds.Value <= 1.05f;
                     snapshot.RespawnConfirmationOpen = snapshot.RespawnAvailable || snapshot.RespawnConfirmationOpen;
                 }
                 else if (!snapshot.RespawnInProgress)

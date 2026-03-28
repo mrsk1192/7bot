@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -20,7 +20,7 @@ namespace mnetSevenDaysBridge
         private readonly InputAdapter inputAdapter;
         private readonly CommandQueue commandQueue;
         private readonly ObservationCommandQueue observationCommandQueue;
-        private readonly TcpListener listener;
+        private TcpListener listener;
         private Thread workerThread;
         private volatile bool running;
 
@@ -44,7 +44,6 @@ namespace mnetSevenDaysBridge
             this.commandQueue = commandQueue ?? throw new ArgumentNullException(nameof(commandQueue));
             this.observationService = observationService ?? throw new ArgumentNullException(nameof(observationService));
             this.observationCommandQueue = observationCommandQueue ?? throw new ArgumentNullException(nameof(observationCommandQueue));
-            listener = new TcpListener(IPAddress.Parse(config.Host), config.Port);
         }
 
         public void Start()
@@ -54,7 +53,7 @@ namespace mnetSevenDaysBridge
                 return;
             }
 
-            listener.Start();
+            StartListenerWithRetry();
             running = true;
             workerThread = new Thread(ListenLoop)
             {
@@ -69,7 +68,7 @@ namespace mnetSevenDaysBridge
             running = false;
             try
             {
-                listener.Stop();
+                listener?.Stop();
             }
             catch (SocketException exception)
             {
@@ -118,6 +117,62 @@ namespace mnetSevenDaysBridge
             logger.Info("HTTP listener stopped.");
         }
 
+        private void StartListenerWithRetry()
+        {
+            const int maxAttempts = 10;
+            const int retryDelayMs = 500;
+            SocketException lastSocketException = null;
+
+            for (var attempt = 1; attempt <= maxAttempts; attempt++)
+            {
+                try
+                {
+                    listener = new TcpListener(IPAddress.Parse(config.Host), config.Port);
+                    listener.Server.ExclusiveAddressUse = true;
+                    listener.Start();
+                    return;
+                }
+                catch (SocketException exception) when (IsTransientPortConflict(exception) && attempt < maxAttempts)
+                {
+                    lastSocketException = exception;
+                    logger.Warn($"HTTP listener bind attempt {attempt}/{maxAttempts} failed for {config.Host}:{config.Port}: {exception.Message}. Retrying...");
+                    SafeStopListener();
+                    Thread.Sleep(retryDelayMs);
+                }
+            }
+
+            if (lastSocketException != null)
+            {
+                throw new InvalidOperationException(
+                    $"The bridge could not bind to {config.Host}:{config.Port} after repeated retries.",
+                    lastSocketException);
+            }
+
+            listener = new TcpListener(IPAddress.Parse(config.Host), config.Port);
+            listener.Server.ExclusiveAddressUse = true;
+            listener.Start();
+        }
+
+        private void SafeStopListener()
+        {
+            try
+            {
+                listener?.Stop();
+            }
+            catch
+            {
+            }
+            finally
+            {
+                listener = null;
+            }
+        }
+
+        private static bool IsTransientPortConflict(SocketException exception)
+        {
+            return exception.SocketErrorCode == SocketError.AddressAlreadyInUse
+                || exception.SocketErrorCode == SocketError.AccessDenied;
+        }
         private void HandleClient(TcpClient client)
         {
             var remoteAddress = ((IPEndPoint)client.Client.RemoteEndPoint).Address;
@@ -572,3 +627,6 @@ namespace mnetSevenDaysBridge
         }
     }
 }
+
+
+

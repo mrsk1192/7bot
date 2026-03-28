@@ -21,7 +21,9 @@ namespace mnetSevenDaysBridge
         private readonly BridgeJson json;
         private readonly HttpListener listener;
         private readonly ConcurrentBag<WebSocket> clients = new ConcurrentBag<WebSocket>();
+        private readonly ConcurrentQueue<string> sendQueue = new ConcurrentQueue<string>();
         private Thread listenerThread;
+        private Thread sendThread;
         private volatile bool running;
         private Timer pingTimer;
 
@@ -49,6 +51,12 @@ namespace mnetSevenDaysBridge
                 Name = "mnetSevenDaysBridge.WebSocketListener"
             };
             listenerThread.Start();
+            sendThread = new Thread(SendLoop)
+            {
+                IsBackground = true,
+                Name = "mnetSevenDaysBridge.WebSocketSender"
+            };
+            sendThread.Start();
             pingTimer = new Timer(SendPing, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
             logger.Info($"WebSocket push server started at ws://{config.Host}:{config.WebSocketPort}/");
         }
@@ -63,6 +71,7 @@ namespace mnetSevenDaysBridge
             running = false;
             try { pingTimer?.Dispose(); } catch { }
             try { listener.Stop(); } catch { }
+            try { sendThread?.Join(500); } catch { }
             logger.Info("WebSocket push server stopped.");
         }
 
@@ -87,35 +96,7 @@ namespace mnetSevenDaysBridge
 
         private void BroadcastRaw(string message)
         {
-            var bytes = Encoding.UTF8.GetBytes(message);
-            var segment = new ArraySegment<byte>(bytes);
-            var dead = new List<WebSocket>();
-
-            foreach (var ws in clients)
-            {
-                try
-                {
-                    if (ws.State == WebSocketState.Open)
-                    {
-                        ws.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None).Wait(500);
-                    }
-                    else
-                    {
-                        dead.Add(ws);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    logger.Warn("WebSocket send failed (client will be removed): " + ex.Message);
-                    dead.Add(ws);
-                }
-            }
-
-            // Rebuild without dead connections.
-            if (dead.Count > 0)
-            {
-                RemoveDeadClients(dead);
-            }
+            sendQueue.Enqueue(message);
         }
 
         private void RemoveDeadClients(List<WebSocket> dead)
@@ -145,6 +126,51 @@ namespace mnetSevenDaysBridge
             catch (Exception ex)
             {
                 logger.Warn("WebSocket ping broadcast failed: " + ex.Message);
+            }
+        }
+
+        private void SendLoop()
+        {
+            while (running)
+            {
+                var drainedAny = false;
+                while (sendQueue.TryDequeue(out var message))
+                {
+                    drainedAny = true;
+                    var bytes = Encoding.UTF8.GetBytes(message);
+                    var segment = new ArraySegment<byte>(bytes);
+                    var dead = new List<WebSocket>();
+
+                    foreach (var ws in clients)
+                    {
+                        try
+                        {
+                            if (ws.State == WebSocketState.Open)
+                            {
+                                ws.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None).Wait(500);
+                            }
+                            else
+                            {
+                                dead.Add(ws);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Warn("WebSocket send failed (client will be removed): " + ex.Message);
+                            dead.Add(ws);
+                        }
+                    }
+
+                    if (dead.Count > 0)
+                    {
+                        RemoveDeadClients(dead);
+                    }
+                }
+
+                if (!drainedAny)
+                {
+                    Thread.Sleep(16);
+                }
             }
         }
 

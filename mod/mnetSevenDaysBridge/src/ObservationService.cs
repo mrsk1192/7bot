@@ -35,7 +35,7 @@ namespace mnetSevenDaysBridge
 
         public ResourceObservation GetResourceObservation()
         {
-            return GetCached(ref cachedResourceObservation, ref cachedResourceObservationUtc, 150, BuildResourceObservation);
+            return GetCached(ref cachedResourceObservation, ref cachedResourceObservationUtc, 500, BuildResourceObservation);
         }
 
         private ResourceObservation BuildResourceObservation()
@@ -365,7 +365,7 @@ namespace mnetSevenDaysBridge
 
         public EnvironmentSummary GetEnvironmentSummary()
         {
-            return GetCached(ref cachedEnvironmentSummary, ref cachedEnvironmentSummaryUtc, 250, BuildEnvironmentSummary);
+            return GetCached(ref cachedEnvironmentSummary, ref cachedEnvironmentSummaryUtc, 1000, BuildEnvironmentSummary);
         }
 
         private EnvironmentSummary BuildEnvironmentSummary()
@@ -393,7 +393,7 @@ namespace mnetSevenDaysBridge
 
         public BiomeInfo GetBiomeInfo()
         {
-            return GetCached(ref cachedBiomeInfo, ref cachedBiomeInfoUtc, 250, BuildBiomeInfo);
+            return GetCached(ref cachedBiomeInfo, ref cachedBiomeInfoUtc, 2000, BuildBiomeInfo);
         }
 
         private BiomeInfo BuildBiomeInfo()
@@ -418,7 +418,7 @@ namespace mnetSevenDaysBridge
 
         public TerrainSummary GetTerrainSummary()
         {
-            return GetCached(ref cachedTerrainSummary, ref cachedTerrainSummaryUtc, 200, BuildTerrainSummary);
+            return GetCached(ref cachedTerrainSummary, ref cachedTerrainSummaryUtc, 1000, BuildTerrainSummary);
         }
 
         private TerrainSummary BuildTerrainSummary()
@@ -435,7 +435,7 @@ namespace mnetSevenDaysBridge
 
         public NearbyResourceCandidatesSummary GetNearbyResourceCandidatesSummary()
         {
-            return GetCached(ref cachedNearbyResourceCandidatesSummary, ref cachedNearbyResourceCandidatesSummaryUtc, 350, BuildNearbyResourceCandidatesSummary);
+            return GetCached(ref cachedNearbyResourceCandidatesSummary, ref cachedNearbyResourceCandidatesSummaryUtc, 1000, BuildNearbyResourceCandidatesSummary);
         }
 
         private NearbyResourceCandidatesSummary BuildNearbyResourceCandidatesSummary()
@@ -457,7 +457,7 @@ namespace mnetSevenDaysBridge
 
         public NearbyInteractablesSummary GetNearbyInteractablesSummary()
         {
-            return GetCached(ref cachedNearbyInteractablesSummary, ref cachedNearbyInteractablesSummaryUtc, 350, BuildNearbyInteractablesSummary);
+            return GetCached(ref cachedNearbyInteractablesSummary, ref cachedNearbyInteractablesSummaryUtc, 1000, BuildNearbyInteractablesSummary);
         }
 
         private NearbyInteractablesSummary BuildNearbyInteractablesSummary()
@@ -495,7 +495,7 @@ namespace mnetSevenDaysBridge
 
         public NearbyEntitiesSummary GetNearbyEntitiesSummary()
         {
-            return GetCached(ref cachedNearbyEntitiesSummary, ref cachedNearbyEntitiesSummaryUtc, 350, BuildNearbyEntitiesSummary);
+            return GetCached(ref cachedNearbyEntitiesSummary, ref cachedNearbyEntitiesSummaryUtc, 1000, BuildNearbyEntitiesSummary);
         }
 
         private NearbyEntitiesSummary BuildNearbyEntitiesSummary()
@@ -756,8 +756,8 @@ namespace mnetSevenDaysBridge
             var interactables = QueryInteractablesInRadius(new Dictionary<string, object>
             {
                 { "center", new Dictionary<string, object> { { "x", player.position.x }, { "y", player.position.y }, { "z", player.position.z } } },
-                { "radius", 8f },
-                { "max_results", 12 },
+                { "radius", 5f },
+                { "max_results", 6 },
                 { "include_blocks", true },
                 { "include_entities", true },
                 { "include_loot", true },
@@ -769,7 +769,7 @@ namespace mnetSevenDaysBridge
             }).Interactables;
 
             var bestInteractable = interactables
-                .Where(item => item != null && item.Position != null && item.Distance <= 8f && ToBool(item.LineOfSightClear))
+                .Where(item => item != null && item.Position != null && item.Distance <= 5f && ToBool(item.LineOfSightClear))
                 .Select(item =>
                 {
                     var offset = ToVector3(item.Position) - eye;
@@ -798,15 +798,15 @@ namespace mnetSevenDaysBridge
             var resources = QueryResourceCandidates(new Dictionary<string, object>
             {
                 { "center", new Dictionary<string, object> { { "x", player.position.x }, { "y", player.position.y }, { "z", player.position.z } } },
-                { "radius", 8f },
-                { "max_results", 12 },
+                { "radius", 5f },
+                { "max_results", 6 },
                 { "include_surface_only", false },
                 { "include_exposed_only", false },
                 { "sort_by", "distance" }
             }).Candidates;
 
             var bestResource = resources
-                .Where(item => item != null && item.Position != null && item.Distance <= 8f && ToBool(item.LineOfSightClear))
+                .Where(item => item != null && item.Position != null && item.Distance <= 5f && ToBool(item.LineOfSightClear))
                 .Select(item =>
                 {
                     var offset = ToVector3(item.Position) - eye;
@@ -835,8 +835,8 @@ namespace mnetSevenDaysBridge
             var entities = QueryEntitiesInRadius(new Dictionary<string, object>
             {
                 { "center", new Dictionary<string, object> { { "x", player.position.x }, { "y", player.position.y }, { "z", player.position.z } } },
-                { "radius", 64f },
-                { "max_results", 16 },
+                { "radius", 24f },
+                { "max_results", 8 },
                 { "include_hostile", true },
                 { "include_npc", true },
                 { "include_animals", true },

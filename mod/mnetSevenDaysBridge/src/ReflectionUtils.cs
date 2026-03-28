@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -13,8 +14,22 @@ namespace mnetSevenDaysBridge
     /// </summary>
     internal static class ReflectionUtils
     {
+        private sealed class CachedMemberLookup
+        {
+            public MemberInfo Member { get; set; }
+        }
+
+        private sealed class CachedMethodLookup
+        {
+            public MethodInfo Method { get; set; }
+        }
+
         private static readonly BindingFlags MemberFlags =
             BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+        private static readonly ConcurrentDictionary<(Type, string), CachedMemberLookup> MemberCache =
+            new ConcurrentDictionary<(Type, string), CachedMemberLookup>();
+        private static readonly ConcurrentDictionary<(Type, string, int), CachedMethodLookup> MethodCache =
+            new ConcurrentDictionary<(Type, string, int), CachedMethodLookup>();
 
         public static object ReadMember(object target, string name)
         {
@@ -24,14 +39,25 @@ namespace mnetSevenDaysBridge
             }
 
             var type = target.GetType();
-            var property = type.GetProperty(name, MemberFlags);
-            if (property != null)
+            var cacheEntry = MemberCache.GetOrAdd(
+                (type, name),
+                key => new CachedMemberLookup
+                {
+                    Member = (MemberInfo)key.Item1.GetProperty(key.Item2, MemberFlags)
+                        ?? key.Item1.GetField(key.Item2, MemberFlags)
+                });
+            var member = cacheEntry.Member;
+            if (member is PropertyInfo property)
             {
                 return property.GetValue(target, null);
             }
 
-            var field = type.GetField(name, MemberFlags);
-            return field == null ? null : field.GetValue(target);
+            if (member is FieldInfo field)
+            {
+                return field.GetValue(target);
+            }
+
+            return null;
         }
 
         public static object InvokeOptional(object target, string methodName, params object[] args)
@@ -41,20 +67,38 @@ namespace mnetSevenDaysBridge
                 return null;
             }
 
-            foreach (var method in target.GetType().GetMethods(MemberFlags))
+            args = args ?? new object[0];
+            var type = target.GetType();
+            var cacheEntry = MethodCache.GetOrAdd(
+                (type, methodName, args.Length),
+                key => new CachedMethodLookup
+                {
+                    Method = ResolveOptionalMethod(key.Item1, key.Item2, key.Item3)
+                });
+            return cacheEntry.Method == null ? null : cacheEntry.Method.Invoke(target, args);
+        }
+
+        private static MethodInfo ResolveOptionalMethod(Type type, string methodName, int argCount)
+        {
+            foreach (var method in type.GetMethods(MemberFlags))
             {
                 if (!string.Equals(method.Name, methodName, StringComparison.Ordinal))
                 {
                     continue;
                 }
 
-                var parameters = method.GetParameters();
-                if (parameters.Length != args.Length)
+                if (method.ContainsGenericParameters)
                 {
                     continue;
                 }
 
-                return method.Invoke(target, args);
+                var parameters = method.GetParameters();
+                if (parameters.Length != argCount)
+                {
+                    continue;
+                }
+
+                return method;
             }
 
             return null;

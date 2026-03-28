@@ -226,7 +226,7 @@ namespace mnetSevenDaysBridge
 
                 var fallbackCooldown = NormalizeCooldown(tracker.ComputeFallbackCooldown(player));
                 var fallbackBedroll = HasBedrollSpawn(player);
-                var fallbackAvailable = !fallbackCooldown.HasValue || fallbackCooldown.Value <= 0.05f;
+                var fallbackAvailable = !fallbackCooldown.HasValue || fallbackCooldown.Value <= 1.05f;
                 return new RespawnUiState
                 {
                     Available = true,
@@ -272,7 +272,7 @@ namespace mnetSevenDaysBridge
                 var selectedMethod = controller == null ? (SpawnMethod?)null : TryReadEnum<SpawnMethod>(controller, "spawnMethod");
                 var spawnTarget = controller == null ? null : ReadMember(controller, "spawnTarget");
                 var respawnAvailable = playerIsDead
-                    && (!cooldown.HasValue || cooldown.Value <= 0.05f);
+                    && (!cooldown.HasValue || cooldown.Value <= 1.05f);
 
                 return new RespawnUiState
                 {
@@ -295,7 +295,7 @@ namespace mnetSevenDaysBridge
                 logger.Warn("Respawn UI probing failed, falling back to player-only state: " + exception.Message);
                 var fallbackCooldown = NormalizeCooldown(tracker.ComputeFallbackCooldown(player));
                 var fallbackBedroll = HasBedrollSpawn(player);
-                var fallbackAvailable = playerIsDead && (!fallbackCooldown.HasValue || fallbackCooldown.Value <= 0.05f);
+                var fallbackAvailable = playerIsDead && (!fallbackCooldown.HasValue || fallbackCooldown.Value <= 1.05f);
                 return new RespawnUiState
                 {
                     Available = true,

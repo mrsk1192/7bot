@@ -12,7 +12,7 @@
 {
   "Ok": true,
   "Command": "get_state",
-  "TimestampUtc": "2026-03-22T00:00:00.0000000Z",
+  "TimestampUtc": "2026-03-27T00:00:00.0000000Z",
   "Data": {},
   "Error": null
 }
@@ -22,7 +22,7 @@
 {
   "Ok": false,
   "Command": null,
-  "TimestampUtc": "2026-03-22T00:00:00.0000000Z",
+  "TimestampUtc": "2026-03-27T00:00:00.0000000Z",
   "Data": null,
   "Error": {
     "Type": "PLAYER_DEAD",
@@ -40,6 +40,14 @@
 - `GET /api/get_player_position`
 - `GET /api/get_player_rotation`
 - `GET /api/get_logs_tail?lines=50`
+- `GET /api/get_look_target`
+- `GET /api/get_interaction_context`
+- `GET /api/query_resource_candidates`
+- `GET /api/query_interactables_in_radius`
+- `GET /api/query_entities_in_radius`
+- `GET /api/get_environment_summary`
+- `GET /api/get_biome_info`
+- `GET /api/get_terrain_summary`
 - `POST /api/command`
 
 ## POST /api/command Body
@@ -51,58 +59,77 @@
 }
 ```
 
-`Command` may be either a state query command such as `get_state` or an action command such as `primary_action_start`.
+`Command` may be either a state query command such as `get_state`, an observation query such as `get_look_target`, or an action command such as `primary_action_start`.
 
-## Action Arguments
+## Observation Query Arguments
 
-### `look_delta`
+### `query_resource_candidates`
 
 ```json
 {
-  "Command": "look_delta",
+  "Command": "query_resource_candidates",
   "Arguments": {
-    "dx": 25.0,
-    "dy": -5.0
+    "x": -250.0,
+    "y": 46.0,
+    "z": 900.0,
+    "radius": 12.0,
+    "max_results": 8,
+    "include_surface_only": true,
+    "include_exposed_only": true,
+    "candidate_categories": ["surface_resource_node", "loot_container"],
+    "likely_resource_types": ["stone", "wood", "loot"],
+    "min_confidence": 0.35,
+    "sort_by": "distance"
   }
 }
 ```
 
-### `select_hotbar_slot`
+### `query_interactables_in_radius`
 
 ```json
 {
-  "Command": "select_hotbar_slot",
+  "Command": "query_interactables_in_radius",
   "Arguments": {
-    "slot": 2
+    "x": -250.0,
+    "y": 46.0,
+    "z": 900.0,
+    "radius": 10.0,
+    "max_results": 10,
+    "include_blocks": true,
+    "include_entities": true,
+    "include_loot": true,
+    "include_doors": true,
+    "include_vehicles": true,
+    "include_npcs": true,
+    "include_traders": true,
+    "include_locked": true
   }
 }
 ```
 
-### `wait_for_respawn_screen`
+### `query_entities_in_radius`
 
 ```json
 {
-  "Command": "wait_for_respawn_screen",
+  "Command": "query_entities_in_radius",
   "Arguments": {
-    "timeout_ms": 15000
-  }
-}
-```
-
-### `wait_for_respawn_complete`
-
-```json
-{
-  "Command": "wait_for_respawn_complete",
-  "Arguments": {
-    "timeout_ms": 30000
+    "x": -250.0,
+    "y": 46.0,
+    "z": 900.0,
+    "radius": 24.0,
+    "max_results": 12,
+    "include_hostile": true,
+    "include_npc": true,
+    "include_animals": true,
+    "include_neutral": true,
+    "include_dead": false
   }
 }
 ```
 
 ## `get_capabilities`
 
-Phase 3 capabilities include:
+Phase 4 capabilities include:
 
 - `Phase`
 - `ActiveBackend`
@@ -112,21 +139,22 @@ Phase 3 capabilities include:
 - `Respawn`
 - `Features`
 
-The `Respawn` block reports:
+Phase 4 observation commands are reported in `Commands`:
 
-- `respawn_select_default`
-- `respawn_at_bedroll`
-- `respawn_near_bedroll`
-- `respawn_at_random`
-- `respawn_confirm`
-- `respawn_cancel`
-- `wait_for_respawn_screen`
-- `wait_for_respawn_complete`
-- `respawn_state_detection`
+- `get_look_target`
+- `get_interaction_context`
+- `query_resource_candidates`
+- `query_interactables_in_radius`
+- `query_entities_in_radius`
+- `get_environment_summary`
+- `get_biome_info`
+- `get_terrain_summary`
+
+`Features.phase4_observation_queries` reports whether the observation pipeline is available.
 
 ## `get_state`
 
-Phase 3 returns the normal state plus death / respawn fields.
+Phase 4 extends `get_state` with observation summaries while keeping the Phase 3 death/respawn fields.
 
 ### `player`
 
@@ -141,6 +169,7 @@ Phase 3 returns the normal state plus death / respawn fields.
 - `NearestSpawnOptionSummary`
 - `RespawnInProgress`
 - `JustRespawned`
+- `HoldingLight`
 
 ### `ui`
 
@@ -153,20 +182,31 @@ Phase 3 returns the normal state plus death / respawn fields.
 - `RespawnScreenOpen`
 - `RespawnConfirmationOpen`
 
-### `input_state`
+### `resource_observation`
 
-- `MoveForward`
-- `MoveBack`
-- `MoveLeft`
-- `MoveRight`
-- `Sprint`
-- `Crouch`
-- `PrimaryAction`
-- `SecondaryAction`
-- `HoldInteract`
-- `AutoRun`
+- `PlayerPosition`
+- `PlayerRotation`
+- `Biome`
+- `LookTarget`
+- `InteractionContext`
+- `Availability`
 
-While dead or respawning, `input_state` remains visible but normal gameplay commands are rejected.
+### `nearby_resource_candidates_summary`
+
+- `Count`
+- `TopCandidates`
+
+### `nearby_interactables_summary`
+
+- `Count`
+- `TopInteractables`
+
+### `nearby_entities_summary`
+
+- `HostileCount`
+- `NpcCount`
+- `NearestHostileDistance`
+- `TopEntities`
 
 ## Respawn Rules
 

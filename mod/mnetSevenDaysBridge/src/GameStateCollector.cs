@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using UnityEngine;
@@ -30,7 +32,7 @@ namespace mnetSevenDaysBridge
             this.observationService = observationService ?? throw new ArgumentNullException(nameof(observationService));
         }
 
-        public BridgeState CollectState()
+        public BridgeState CollectState(bool includeObservation = true)
         {
             var world = GetWorld();
             var player = GetPrimaryPlayer(world);
@@ -106,10 +108,11 @@ namespace mnetSevenDaysBridge
                     UiStateAvailable = uiState != null,
                     RespawnStateAvailable = true
                 },
-                ResourceObservation = observationService.GetResourceObservation(),
-                NearbyResourceCandidatesSummary = observationService.GetNearbyResourceCandidatesSummary(),
-                NearbyInteractablesSummary = observationService.GetNearbyInteractablesSummary(),
-                NearbyEntitiesSummary = observationService.GetNearbyEntitiesSummary()
+                InventorySummary = includeObservation ? TryCollectInventorySummary(player) : null,
+                ResourceObservation = includeObservation ? observationService.GetResourceObservation() : null,
+                NearbyResourceCandidatesSummary = includeObservation ? observationService.GetNearbyResourceCandidatesSummary() : null,
+                NearbyInteractablesSummary = includeObservation ? observationService.GetNearbyInteractablesSummary() : null,
+                NearbyEntitiesSummary = includeObservation ? observationService.GetNearbyEntitiesSummary() : null
             };
         }
 
@@ -330,6 +333,339 @@ namespace mnetSevenDaysBridge
             return TryReadBool(player, "IsHoldingLight");
         }
 
+        private InventorySummary TryCollectInventorySummary(object player)
+        {
+            var empty = new InventorySummary
+            {
+                SlotCount = 0,
+                Items = new List<InventoryItemObservation>(),
+                Note = "Inventory summary was unavailable."
+            };
+
+            if (player == null)
+            {
+                return empty;
+            }
+
+            try
+            {
+                var inventory = ReadMember(player, "inventory")
+                    ?? ReadMember(player, "Inventory");
+                if (inventory == null)
+                {
+                    return empty;
+                }
+
+                var holdingIndex = TryReadInt(inventory, "holdingItemIdx", "HoldingItemIdx", "selectedHotbarSlot");
+                var slots = ReadMember(inventory, "slots") as IEnumerable;
+                var items = slots == null
+                    ? EnumerateInventoryItems(inventory, holdingIndex)
+                    : EnumerateInventorySlots(slots, holdingIndex);
+                var resourceWoodCount = TryReadInventoryItemCount(inventory, "resourceWood")
+                    ?? TryReadInventoryItemCount(inventory, "wood");
+                return new InventorySummary
+                {
+                    SlotCount = items.Count,
+                    Items = items,
+                    ResourceWoodCount = resourceWoodCount,
+                    Note = items.Count > 0
+                        ? "Inventory summary was collected from reflected inventory slots."
+                        : resourceWoodCount.HasValue
+                            ? "Inventory slots were empty or opaque, but direct item counts were available."
+                            : "Inventory was available but no populated slots were enumerated."
+                };
+            }
+            catch (Exception exception)
+            {
+                logger.Error("Failed to collect the inventory summary.", exception);
+                return empty;
+            }
+        }
+
+        private List<InventoryItemObservation> EnumerateInventorySlots(IEnumerable slots, int? holdingIndex)
+        {
+            var items = new List<InventoryItemObservation>();
+            if (slots == null)
+            {
+                return items;
+            }
+
+            foreach (var entry in slots)
+            {
+                if (entry == null)
+                {
+                    continue;
+                }
+
+                var slotIndex = TryReadInt(entry, "slotIdx", "SlotIdx", "index", "Index") ?? items.Count;
+                var itemStack = ReadMember(entry, "itemStack")
+                    ?? ReadMember(entry, "ItemStack");
+                var count = TryReadInt(itemStack, "count", "Count", "itemCount");
+                if (!count.HasValue || count.Value <= 0)
+                {
+                    continue;
+                }
+
+                var itemValue = ReadMember(entry, "itemValue")
+                    ?? ReadMember(itemStack, "itemValue")
+                    ?? ReadMember(itemStack, "ItemValue");
+                var itemClass = ReadMember(entry, "item")
+                    ?? ReadMember(entry, "Item")
+                    ?? ReadMember(itemValue, "ItemClass")
+                    ?? ReadMember(itemValue, "itemClass");
+                var itemName = ResolveInventoryItemName(itemValue, itemClass);
+                if (string.IsNullOrWhiteSpace(itemName))
+                {
+                    continue;
+                }
+
+                items.Add(new InventoryItemObservation
+                {
+                    SlotIndex = slotIndex,
+                    ItemName = itemName,
+                    ItemClass = ResolveInventoryItemClassName(itemClass, itemValue),
+                    Count = count.Value,
+                    IsHoldingSlot = holdingIndex.HasValue && holdingIndex.Value == slotIndex,
+                    Note = "Inventory item reflected from Inventory.slots."
+                });
+            }
+
+            return items;
+        }
+
+        private int? TryReadInventoryItemCount(object inventory, string itemName)
+        {
+            if (inventory == null || string.IsNullOrWhiteSpace(itemName))
+            {
+                return null;
+            }
+
+            try
+            {
+                var itemValue = InvokeStaticMethod(typeof(ItemClass), "GetItem", itemName, true);
+                if (itemValue == null)
+                {
+                    return null;
+                }
+
+                var raw = InvokeMember(inventory, "GetItemCount", itemValue, false, 0, 0, false);
+                if (raw is int intValue)
+                {
+                    return intValue;
+                }
+
+                if (int.TryParse(Convert.ToString(raw, CultureInfo.InvariantCulture), out var parsed))
+                {
+                    return parsed;
+                }
+            }
+            catch (Exception exception)
+            {
+                logger.Warn("Failed to read inventory count for item '" + itemName + "': " + exception.Message);
+            }
+
+            return null;
+        }
+
+        private List<InventoryItemObservation> EnumerateInventoryItems(object inventory, int? holdingIndex)
+        {
+            var items = new List<InventoryItemObservation>();
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            var slotIndex = 0;
+
+            foreach (var collection in EnumerateInventoryCollections(inventory))
+            {
+                foreach (var item in EnumerateInventoryItemsFromCollection(collection, slotIndex, holdingIndex))
+                {
+                    var key = string.Format(
+                        CultureInfo.InvariantCulture,
+                        "{0}|{1}|{2}|{3}",
+                        item.SlotIndex,
+                        item.ItemName ?? string.Empty,
+                        item.ItemClass ?? string.Empty,
+                        item.Count);
+                    if (seen.Add(key))
+                    {
+                        items.Add(item);
+                    }
+                }
+
+                if (collection is IEnumerable countedCollection)
+                {
+                    foreach (var _ in countedCollection)
+                    {
+                        slotIndex++;
+                    }
+                }
+            }
+
+            return items;
+        }
+
+        private IEnumerable<object> EnumerateInventoryCollections(object inventory)
+        {
+            if (inventory == null)
+            {
+                yield break;
+            }
+
+            var yielded = new HashSet<object>(ReferenceEqualityComparer.Instance);
+            var rootNames = new[]
+            {
+                "slots",
+                "Slots",
+                "itemStacks",
+                "ItemStacks",
+                "items",
+                "Items",
+                "backpack",
+                "Backpack",
+                "toolbelt",
+                "Toolbelt",
+                "bag",
+                "Bag"
+            };
+
+            foreach (var name in rootNames)
+            {
+                var value = ReadMember(inventory, name) ?? InvokeMember(inventory, name);
+                if (value == null)
+                {
+                    continue;
+                }
+
+                if (yielded.Add(value))
+                {
+                    yield return value;
+                }
+
+                var nestedNames = new[] { "slots", "Slots", "itemStacks", "ItemStacks", "items", "Items" };
+                foreach (var nestedName in nestedNames)
+                {
+                    var nestedValue = ReadMember(value, nestedName) ?? InvokeMember(value, nestedName);
+                    if (nestedValue != null && yielded.Add(nestedValue))
+                    {
+                        yield return nestedValue;
+                    }
+                }
+            }
+        }
+
+        private IEnumerable<InventoryItemObservation> EnumerateInventoryItemsFromCollection(object collection, int startSlotIndex, int? holdingIndex)
+        {
+            if (!(collection is IEnumerable enumerable))
+            {
+                yield break;
+            }
+
+            var slotIndex = startSlotIndex;
+            foreach (var entry in enumerable)
+            {
+                var currentSlot = slotIndex;
+                slotIndex++;
+                var item = TryBuildInventoryItem(entry, currentSlot, holdingIndex);
+                if (item != null)
+                {
+                    yield return item;
+                }
+            }
+        }
+
+        private InventoryItemObservation TryBuildInventoryItem(object entry, int slotIndex, int? holdingIndex)
+        {
+            if (entry == null)
+            {
+                return null;
+            }
+
+            var count = TryReadInt(entry, "count", "Count", "itemCount");
+            var itemValue = ReadMember(entry, "itemValue")
+                ?? ReadMember(entry, "ItemValue")
+                ?? entry;
+            var itemClass = ReadMember(itemValue, "ItemClass")
+                ?? ReadMember(itemValue, "itemClass")
+                ?? ReadMember(entry, "ItemClass")
+                ?? ReadMember(entry, "itemClass");
+
+            if (!count.HasValue)
+            {
+                count = TryReadInt(itemValue, "count", "Count", "itemCount");
+            }
+
+            if (!count.HasValue || count.Value <= 0)
+            {
+                return null;
+            }
+
+            var itemName = ResolveInventoryItemName(itemValue, itemClass);
+            if (string.IsNullOrWhiteSpace(itemName))
+            {
+                return null;
+            }
+
+            return new InventoryItemObservation
+            {
+                SlotIndex = slotIndex,
+                ItemName = itemName,
+                ItemClass = ResolveInventoryItemClassName(itemClass, itemValue),
+                Count = count.Value,
+                IsHoldingSlot = holdingIndex.HasValue && holdingIndex.Value == slotIndex,
+                Note = "Inventory item reflected from a populated slot."
+            };
+        }
+
+        private string ResolveInventoryItemName(object itemValue, object itemClass)
+        {
+            var candidates = new[]
+            {
+                ReadMember(itemValue, "ItemName"),
+                ReadMember(itemValue, "Name"),
+                ReadMember(itemValue, "name"),
+                InvokeMember(itemValue, "GetItemName"),
+                ReadMember(itemClass, "ItemName"),
+                ReadMember(itemClass, "LocalizedName"),
+                ReadMember(itemClass, "Name"),
+                ReadMember(itemClass, "name"),
+                InvokeMember(itemClass, "GetItemName"),
+                InvokeMember(itemClass, "GetLocalizedItemName"),
+            };
+
+            foreach (var candidate in candidates)
+            {
+                var text = Convert.ToString(candidate, CultureInfo.InvariantCulture);
+                if (!string.IsNullOrWhiteSpace(text) && !string.Equals(text, "Air", StringComparison.OrdinalIgnoreCase))
+                {
+                    return text;
+                }
+            }
+
+            var fallback = itemValue == null ? null : itemValue.ToString();
+            return string.IsNullOrWhiteSpace(fallback) || string.Equals(fallback, "Air", StringComparison.OrdinalIgnoreCase)
+                ? null
+                : fallback;
+        }
+
+        private string ResolveInventoryItemClassName(object itemClass, object itemValue)
+        {
+            var candidates = new[]
+            {
+                Convert.ToString(ReadMember(itemClass, "Name"), CultureInfo.InvariantCulture),
+                Convert.ToString(ReadMember(itemClass, "name"), CultureInfo.InvariantCulture),
+                Convert.ToString(ReadMember(itemValue, "Name"), CultureInfo.InvariantCulture),
+                Convert.ToString(ReadMember(itemValue, "name"), CultureInfo.InvariantCulture),
+            };
+
+            foreach (var candidate in candidates)
+            {
+                if (!string.IsNullOrWhiteSpace(candidate))
+                {
+                    return candidate;
+                }
+            }
+
+            return itemClass == null ? itemValue?.GetType().Name : itemClass.GetType().Name;
+        }
+
         private float? TryReadNestedStat(object root, params string[] names)
         {
             if (root == null)
@@ -527,6 +863,32 @@ namespace mnetSevenDaysBridge
             return field == null ? null : field.GetValue(null);
         }
 
+        private object InvokeStaticMethod(Type type, string methodName, params object[] args)
+        {
+            if (type == null || string.IsNullOrWhiteSpace(methodName))
+            {
+                return null;
+            }
+
+            foreach (var candidate in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+            {
+                if (!string.Equals(candidate.Name, methodName, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                var parameters = candidate.GetParameters();
+                if (parameters.Length != args.Length)
+                {
+                    continue;
+                }
+
+                return candidate.Invoke(null, args);
+            }
+
+            return null;
+        }
+
         private object ReadMember(object target, string name)
         {
             if (target == null || string.IsNullOrWhiteSpace(name))
@@ -569,6 +931,21 @@ namespace mnetSevenDaysBridge
             }
 
             return null;
+        }
+
+        private sealed class ReferenceEqualityComparer : IEqualityComparer<object>
+        {
+            public static readonly ReferenceEqualityComparer Instance = new ReferenceEqualityComparer();
+
+            public new bool Equals(object x, object y)
+            {
+                return ReferenceEquals(x, y);
+            }
+
+            public int GetHashCode(object obj)
+            {
+                return obj == null ? 0 : System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
+            }
         }
     }
 }

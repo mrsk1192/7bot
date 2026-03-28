@@ -36,6 +36,7 @@ namespace mnetSevenDaysBridge
         public UiState Ui { get; set; }
         public InputState InputState { get; set; }
         public Availability Availability { get; set; }
+        public InventorySummary InventorySummary { get; set; }
         public ResourceObservation ResourceObservation { get; set; }
         public NearbyResourceCandidatesSummary NearbyResourceCandidatesSummary { get; set; }
         public NearbyInteractablesSummary NearbyInteractablesSummary { get; set; }
@@ -117,6 +118,24 @@ namespace mnetSevenDaysBridge
         public bool InputBackendAvailable { get; set; }
         public bool UiStateAvailable { get; set; }
         public bool RespawnStateAvailable { get; set; }
+    }
+
+    public sealed class InventorySummary
+    {
+        public int SlotCount { get; set; }
+        public IList<InventoryItemObservation> Items { get; set; }
+        public int? ResourceWoodCount { get; set; }
+        public string Note { get; set; }
+    }
+
+    public sealed class InventoryItemObservation
+    {
+        public int SlotIndex { get; set; }
+        public string ItemName { get; set; }
+        public string ItemClass { get; set; }
+        public int Count { get; set; }
+        public bool IsHoldingSlot { get; set; }
+        public string Note { get; set; }
     }
 
     public sealed class Vector3State
