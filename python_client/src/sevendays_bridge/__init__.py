@@ -15,7 +15,6 @@ from .commanding import (
 from .decision import ActionPlan, ActionSelector, DecisionTarget, ScoredTarget, TargetClassifier, TargetPriority
 from .exceptions import BridgeApiError, BridgeConnectionError, BridgeProtocolError
 from .exploration import ExplorerCandidate, FrontierSelector, ScanAngleObservation, SearchGrid, SearchState, SectorScan, SectorScanResult, SystematicExplorer
-from .gui import AgentCommandView, AgentControlCallbacks, AgentControlPanel, AgentStatusViewModel, BaseFormData, BaseViewModel, CommandFormData, PanelSnapshot, ScanSettingsFormData
 from .movement import (
     ApproachResult,
     HeadingController,
@@ -62,17 +61,22 @@ from .models import (
     VersionInfo,
 )
 from .priority import EquipmentStatus, InventoryStatus, PriorityActionKind, PriorityDecision, PriorityMonitor, PrioritySeverity, PrioritySnapshot
-from .runtime import AgentController, AgentGuiRuntimeAdapter, AgentTickResult
+from .runtime import AgentController, AgentTickResult
 from .search import ResultMemory, SearchContext, SearchLoop, SearchLoopResult, SearchStateMachine, SearchStateMachineState
+
+try:
+    from .gui import AgentCommandView, AgentControlCallbacks, AgentControlPanel, AgentStatusViewModel, BaseFormData, BaseViewModel, CommandFormData, PanelSnapshot, ScanSettingsFormData
+except ImportError:
+    pass
+
+try:
+    from .runtime import AgentGuiRuntimeAdapter
+except ImportError:
+    pass
 
 __all__ = [
     "AgentCommand",
-    "AgentCommandView",
-    "AgentControlCallbacks",
-    "AgentControlPanel",
     "AgentController",
-    "AgentGuiRuntimeAdapter",
-    "AgentStatusViewModel",
     "ActionPlan",
     "ActionSelector",
     "ActionCapabilityInfo",
@@ -82,8 +86,6 @@ __all__ = [
     "BaseDefinition",
     "BaseRegistry",
     "BaseReturnCondition",
-    "BaseFormData",
-    "BaseViewModel",
     "BaseZone",
     "BaseZoneType",
     "BiomeInfo",
@@ -169,7 +171,7 @@ __all__ = [
     "VersionInfo",
     "InventoryStatus",
     "AgentTickResult",
-    "CommandFormData",
-    "PanelSnapshot",
-    "ScanSettingsFormData",
 ]
+
+if "AgentGuiRuntimeAdapter" in globals():
+    __all__.append("AgentGuiRuntimeAdapter")

@@ -11,7 +11,6 @@ from sevendays_bridge.build import BuildExecutor, BuildPlanRegistry, BuildProgre
 from sevendays_bridge.commanding import AgentCommand, CommandActionType, CommandInterruptPolicy, CommandQueue, CommandStatus
 from sevendays_bridge.decision import ActionSelector
 from sevendays_bridge.exceptions import BridgeApiError, BridgeConnectionError, BridgeProtocolError
-from sevendays_bridge.gui import AgentCommandView, AgentStatusViewModel, BaseViewModel
 from sevendays_bridge.movement import NavigationConfig, TargetApproach
 from sevendays_bridge.priority import PriorityDecision, PriorityMonitor, PrioritySeverity, PrioritySnapshot
 from sevendays_bridge.search import ResultMemory, SearchLoop
@@ -61,6 +60,7 @@ class AgentController:
         self._last_connection_log_signature = ""
         self._lock = threading.RLock()
         self._state_changed_callback = state_changed_callback
+        self._state_change_listeners: list[Callable[[], None]] = []
         self._cached_state = None
         self._cached_environment_summary = None
         self._rebuild_navigation_dependencies()
@@ -171,7 +171,16 @@ class AgentController:
             self._notify_state_changed()
             return self.config
 
-    def build_status_view_model(self, snapshot: Optional[PrioritySnapshot] = None) -> AgentStatusViewModel:
+    def add_state_change_listener(self, listener: Callable[[], None]) -> None:
+        with self._lock:
+            self._state_change_listeners.append(listener)
+
+    def remove_state_change_listener(self, listener: Callable[[], None]) -> None:
+        with self._lock:
+            self._state_change_listeners = [registered for registered in self._state_change_listeners if registered is not listener]
+
+    def get_raw_status(self, snapshot: Optional[PrioritySnapshot] = None) -> dict:
+        """Return raw runtime status without any GUI view-model dependency."""
         with self._lock:
             if self._cached_state is None or self._cached_environment_summary is None:
                 self._refresh_observation_cache_locked()
@@ -179,22 +188,22 @@ class AgentController:
             environment_summary = self._cached_environment_summary
             player = getattr(state, "player", None)
             current = self.command_queue.current()
-            command_views = [
-                AgentCommandView(
-                    command_id=command.command_id,
-                    action_type=command.action_type.value,
-                    status=command.status.value,
-                    priority=int(command.priority),
-                    summary=self._command_summary(command),
-                )
+            command_list = [
+                {
+                    "command_id": command.command_id,
+                    "action_type": command.action_type.value,
+                    "status": command.status.value,
+                    "priority": int(command.priority),
+                    "summary": self._command_summary(command),
+                }
                 for command in self.command_queue.list_commands()
             ]
-            base_views = [
-                BaseViewModel(
-                    base_id=base.base_id,
-                    base_name=base.base_name,
-                    build_plan_id=base.build_plan_id or "",
-                )
+            base_list = [
+                {
+                    "base_id": base.base_id,
+                    "base_name": base.base_name,
+                    "build_plan_id": base.build_plan_id or "",
+                }
                 for base in self.base_registry.list_bases()
             ]
             decisions = []
@@ -213,23 +222,23 @@ class AgentController:
             weight_text = "unknown"
             if snapshot is not None:
                 weight_text = f"{snapshot.inventory_status.carried_weight_ratio:.2f}"
-            return AgentStatusViewModel(
-                current_action="idle" if current is None else current.action_type.value,
-                current_target=self._command_summary(current) if current is not None else "none",
-                interrupt_reason=self.last_interrupt_reason or ("none" if not decisions else decisions[0].reason),
-                health=self._fraction_text(getattr(player, "hp", None), getattr(player, "max_hp", None)),
-                water=self._value_text(getattr(player, "water", None)),
-                hunger=self._value_text(getattr(player, "food", None)),
-                stamina=self._fraction_text(getattr(player, "stamina", None), getattr(player, "max_stamina", None)),
-                debuffs=debuff_text,
-                carried_weight=weight_text,
-                equipment_state=equipment_text,
-                agent_state="running" if self._agent_running else "stopped",
-                connection_state=self._connection_state,
-                command_queue=command_views,
-                bases=base_views,
-                logs=self.logs[-50:],
-            )
+            return {
+                "current_action": "idle" if current is None else current.action_type.value,
+                "current_target": self._command_summary(current) if current is not None else "none",
+                "interrupt_reason": self.last_interrupt_reason or ("none" if not decisions else decisions[0].reason),
+                "health": self._fraction_text(getattr(player, "hp", None), getattr(player, "max_hp", None)),
+                "water": self._value_text(getattr(player, "water", None)),
+                "hunger": self._value_text(getattr(player, "food", None)),
+                "stamina": self._fraction_text(getattr(player, "stamina", None), getattr(player, "max_stamina", None)),
+                "debuffs": debuff_text,
+                "carried_weight": weight_text,
+                "equipment_state": equipment_text,
+                "agent_state": "running" if self._agent_running else "stopped",
+                "connection_state": self._connection_state,
+                "commands": command_list,
+                "bases": base_list,
+                "logs": self.logs[-50:],
+            }
 
     def tick(self, snapshot: Optional[PrioritySnapshot] = None) -> AgentTickResult:
         with self._lock:
@@ -470,6 +479,11 @@ class AgentController:
         callback = self._state_changed_callback
         if callback is not None:
             callback()
+        for listener in list(self._state_change_listeners):
+            try:
+                listener()
+            except Exception:
+                pass
 
     def _rebuild_navigation_dependencies(self) -> None:
         self.search_loop = SearchLoop(self.client, config=self.config, result_memory=self.result_memory)

@@ -12,7 +12,9 @@ from sevendays_bridge.commanding import (
     CommandPriority,
     CommandRetryPolicy,
 )
-from sevendays_bridge.gui import AgentControlCallbacks, BaseFormData, CommandFormData, ScanSettingsFormData
+from sevendays_bridge.gui import AgentCommandView, AgentControlCallbacks, AgentStatusViewModel, BaseViewModel
+
+from .form_models import BaseFormData, CommandFormData, ScanSettingsFormData
 
 from .agent_controller import AgentController
 
@@ -25,7 +27,7 @@ class AgentGuiRuntimeAdapter:
 
     def build_callbacks(self) -> AgentControlCallbacks:
         return AgentControlCallbacks(
-            refresh_status=self.controller.build_status_view_model,
+            refresh_status=self.build_status_view_model,
             start_agent=self.controller.start_agent,
             stop_agent=self.controller.stop_agent,
             submit_command_form=self.submit_command_form,
@@ -40,6 +42,42 @@ class AgentGuiRuntimeAdapter:
             start_build_for_selected_base=self.start_build_for_selected_base,
             read_scan_settings=self.read_scan_settings,
             submit_scan_settings_form=self.submit_scan_settings_form,
+        )
+
+    def build_status_view_model(self, snapshot=None) -> AgentStatusViewModel:
+        raw = self.controller.get_raw_status(snapshot)
+        return AgentStatusViewModel(
+            current_action=raw["current_action"],
+            current_target=raw["current_target"],
+            interrupt_reason=raw["interrupt_reason"],
+            health=raw["health"],
+            water=raw["water"],
+            hunger=raw["hunger"],
+            stamina=raw["stamina"],
+            debuffs=raw["debuffs"],
+            carried_weight=raw["carried_weight"],
+            equipment_state=raw["equipment_state"],
+            agent_state=raw["agent_state"],
+            connection_state=raw["connection_state"],
+            command_queue=[
+                AgentCommandView(
+                    command_id=command["command_id"],
+                    action_type=command["action_type"],
+                    status=command["status"],
+                    priority=command["priority"],
+                    summary=command["summary"],
+                )
+                for command in raw["commands"]
+            ],
+            bases=[
+                BaseViewModel(
+                    base_id=base["base_id"],
+                    base_name=base["base_name"],
+                    build_plan_id=base["build_plan_id"],
+                )
+                for base in raw["bases"]
+            ],
+            logs=raw["logs"],
         )
 
     def submit_command_form(self, form: CommandFormData, selected_command_id: str | None) -> None:

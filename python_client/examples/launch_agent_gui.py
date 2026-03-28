@@ -45,6 +45,14 @@ def main() -> int:
     stop_event = threading.Event()
     worker_thread: threading.Thread | None = None
 
+    def on_controller_changed() -> None:
+        try:
+            root.after_idle(panel.refresh)
+        except Exception:
+            pass
+
+    controller.add_state_change_listener(on_controller_changed)
+
     def runtime_worker() -> None:
         while not stop_event.is_set():
             try:
@@ -82,6 +90,7 @@ def main() -> int:
             navigation_config=controller.get_navigation_config(),
             last_interrupt_reason=controller.last_interrupt_reason,
         )
+        controller.remove_state_change_listener(on_controller_changed)
         root.destroy()
 
     # Prime the UI once before the periodic runtime loop starts.
@@ -92,7 +101,7 @@ def main() -> int:
         controller.logs.append(f"startup_refresh_error:{type(exc).__name__}:{exc}")
     worker_thread = threading.Thread(target=runtime_worker, name="agent-runtime-worker", daemon=True)
     worker_thread.start()
-    root.after(1500, refresh_gui)
+    root.after(5000, refresh_gui)
     root.protocol("WM_DELETE_WINDOW", shutdown)
     panel.run()
     return 0
